@@ -8,6 +8,8 @@
 .hero-tools{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 .skin-picker{min-width:145px;font-size:.72rem;color:var(--muted);gap:5px}
 .skin-picker select{padding:8px 10px;border-radius:999px;font-size:.78rem;font-weight:750}
+.local-badge{font-size:0}
+.local-badge::after{content:"Release 1.2.1 · Browser based";font-size:.78rem}
 .file-action-row{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap}
 .file-action-row .small-ghost-button{font-size:.76rem;padding:7px 10px}
 
