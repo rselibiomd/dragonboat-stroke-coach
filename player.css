@@ -1,0 +1,33 @@
+/* External video controls + review-card fullscreen */
+.external-player-controls{display:grid;grid-template-columns:auto minmax(120px,1fr) auto auto;gap:10px;align-items:center;margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:11px;background:#091626}
+.player-button{border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--text);border-radius:9px;padding:8px 11px;font-weight:800;white-space:nowrap}
+.player-button:hover{border-color:var(--accent);color:var(--accent-2)}
+.player-seek{appearance:none;-webkit-appearance:none;height:6px;padding:0;border:0;border-radius:999px;background:#26364c;cursor:pointer}
+.player-seek::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid #06261e}
+.player-seek::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid #06261e}
+.player-seek:disabled{opacity:.4;cursor:default}
+.player-time{display:flex;align-items:center;gap:5px;font-variant-numeric:tabular-nums;font-size:.78rem;color:var(--muted);white-space:nowrap}
+.player-time span:first-child{color:var(--accent-2);font-weight:800}
+.review-video{cursor:pointer}
+
+.video-review-card:fullscreen,.video-review-card.pseudo-fullscreen{background:#07101c;border:0;border-radius:0;padding:16px;display:flex;flex-direction:column;width:100vw;height:100vh;max-width:none;overflow:auto}
+.video-review-card:fullscreen .video-card-heading,.video-review-card.pseudo-fullscreen .video-card-heading{flex:0 0 auto}
+.video-review-card:fullscreen .review-video,.video-review-card.pseudo-fullscreen .review-video{flex:1 1 auto;min-height:0;max-height:calc(100vh - 280px);object-fit:contain;background:#000}
+.video-review-card:fullscreen .external-player-controls,.video-review-card.pseudo-fullscreen .external-player-controls{flex:0 0 auto}
+.video-review-card:fullscreen .scrub-controls,.video-review-card.pseudo-fullscreen .scrub-controls{flex:0 0 auto}
+.video-review-card:fullscreen .video-options,.video-review-card.pseudo-fullscreen .video-options{flex:0 0 auto}
+.video-review-card:fullscreen .mark-frame-box,.video-review-card.pseudo-fullscreen .mark-frame-box{flex:0 0 auto}
+.video-review-card:fullscreen .reference-note,.video-review-card.pseudo-fullscreen .reference-note{flex:0 0 auto}
+
+.video-review-card.pseudo-fullscreen{position:fixed;inset:0;z-index:9999}
+body.review-fullscreen-active{overflow:hidden}
+
+@media(max-width:700px){
+  .external-player-controls{grid-template-columns:auto 1fr auto;grid-template-areas:"play seek full" "time time time"}
+  .external-player-controls [data-play-video]{grid-area:play}
+  .external-player-controls .player-seek{grid-area:seek}
+  .external-player-controls .player-time{grid-area:time;justify-self:center}
+  .external-player-controls [data-fullscreen-video]{grid-area:full}
+  .video-review-card:fullscreen,.video-review-card.pseudo-fullscreen{padding:10px}
+  .video-review-card:fullscreen .review-video,.video-review-card.pseudo-fullscreen .review-video{max-height:calc(100vh - 330px)}
+}
