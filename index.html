@@ -3,141 +3,209 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0a1020" />
-  <title>Dragonboat Stroke Coach</title>
+  <meta name="theme-color" content="#07101c" />
+  <title>KDBC Dragonboat Stroke Review</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <main class="app-shell">
     <header class="hero">
       <div>
-        <p class="eyebrow">KDBC COACHING TOOL</p>
-        <h1>Dragonboat Stroke Coach</h1>
-        <p class="hero-copy">Upload a short paddling clip, optionally add a reference clip, and get focused technical feedback on Set-up, Catch, Pull, and Exit/Recovery.</p>
+        <p class="eyebrow">KINGSTON DRAGONBOAT CLUB</p>
+        <h1>Dragonboat Stroke Review</h1>
+        <p class="hero-copy">Review a paddler clip frame by frame, compare it with a reference video, select what you actually observe, and generate clear standardized coaching feedback.</p>
       </div>
+      <div class="local-badge">100% browser based</div>
     </header>
 
-    <section class="notice" aria-label="Important note">
-      <strong>Coach-first analysis.</strong>
-      The tool prioritizes the clearest 1 to 3 corrections and avoids inventing issues that are not visible from the camera angle.
+    <section class="notice">
+      <strong>No AI or API required.</strong> Videos stay in your browser. The coach makes the technical decisions, and the tool organizes them using the KDBC stroke model, cue bank, and drill system.
     </section>
 
     <section class="panel upload-grid">
       <div class="upload-card">
         <div class="section-heading">
-          <div>
-            <span class="step">1</span>
-            <h2>Paddler clip</h2>
-          </div>
+          <div><span class="step">1</span><h2>Paddler clip</h2></div>
           <span class="required">Required</span>
         </div>
         <label class="drop-zone" id="clipDropZone">
           <input id="clipInput" type="file" accept="video/*,.mov,.mp4,.m4v,.webm" />
-          <span class="drop-title">Choose a short video</span>
-          <span class="drop-subtitle">Best with 5 to 20 seconds and a clear side or diagonal view.</span>
+          <span class="drop-title">Choose a short paddling clip</span>
+          <span class="drop-subtitle">A clear side or diagonal angle is best. Short clips are easier to review.</span>
         </label>
-        <video id="clipPreview" class="video-preview hidden" controls muted playsinline></video>
         <div id="clipMeta" class="file-meta hidden"></div>
       </div>
 
       <div class="upload-card">
         <div class="section-heading">
-          <div>
-            <span class="step">2</span>
-            <h2>Reference clip</h2>
-          </div>
+          <div><span class="step">2</span><h2>Reference clip</h2></div>
           <span class="optional">Optional</span>
         </div>
         <label class="drop-zone secondary" id="referenceDropZone">
           <input id="referenceInput" type="file" accept="video/*,.mov,.mp4,.m4v,.webm" />
-          <span class="drop-title">Add a technique reference</span>
-          <span class="drop-subtitle">For example, the Montreal race clip. The model compares body sequence, not stroke rate.</span>
+          <span class="drop-title">Add the Montreal reference or another model</span>
+          <span class="drop-subtitle">Use it for visual comparison of body sequence and positioning, not to copy stroke rate.</span>
         </label>
-        <video id="referencePreview" class="video-preview hidden" controls muted playsinline></video>
         <div id="referenceMeta" class="file-meta hidden"></div>
       </div>
     </section>
 
-    <section class="panel">
+    <section id="reviewWorkspace" class="panel hidden">
       <div class="section-heading compact">
-        <div>
-          <span class="step">3</span>
-          <h2>Analysis target</h2>
+        <div><span class="step">3</span><h2>Review the stroke</h2></div>
+      </div>
+      <p class="muted workspace-intro">Pause the video and step through the stroke. Frame stepping is approximate, so choose the recording frame rate that best matches your clip.</p>
+
+      <div class="video-workspace" id="videoWorkspace">
+        <article class="video-review-card">
+          <div class="video-card-heading">
+            <strong>Paddler clip</strong>
+            <span id="clipTime" class="time-readout">0.00s</span>
+          </div>
+          <video id="clipPreview" class="review-video" controls muted playsinline></video>
+          <div class="scrub-controls">
+            <button type="button" data-step-video="clip" data-step="-0.5">-0.5s</button>
+            <button type="button" data-frame-video="clip" data-direction="-1">◀ Frame</button>
+            <button type="button" data-frame-video="clip" data-direction="1">Frame ▶</button>
+            <button type="button" data-step-video="clip" data-step="0.5">+0.5s</button>
+          </div>
+          <div class="video-options">
+            <label>Frame rate
+              <select id="clipFps">
+                <option value="30" selected>30 fps</option>
+                <option value="60">60 fps</option>
+                <option value="120">120 fps</option>
+                <option value="24">24 fps</option>
+              </select>
+            </label>
+            <label>Playback
+              <select id="clipSpeed">
+                <option value="0.25">0.25x</option>
+                <option value="0.5" selected>0.5x</option>
+                <option value="0.75">0.75x</option>
+                <option value="1">1x</option>
+              </select>
+            </label>
+          </div>
+          <div class="mark-frame-box">
+            <span>Mark this paddler frame as:</span>
+            <div class="phase-buttons">
+              <button type="button" data-mark-phase="setup">Set-up</button>
+              <button type="button" data-mark-phase="catch">Catch</button>
+              <button type="button" data-mark-phase="pull">Pull</button>
+              <button type="button" data-mark-phase="exit">Exit/Recovery</button>
+            </div>
+          </div>
+        </article>
+
+        <article id="referenceCard" class="video-review-card hidden">
+          <div class="video-card-heading">
+            <strong>Reference clip</strong>
+            <span id="referenceTime" class="time-readout">0.00s</span>
+          </div>
+          <video id="referencePreview" class="review-video" controls muted playsinline></video>
+          <div class="scrub-controls">
+            <button type="button" data-step-video="reference" data-step="-0.5">-0.5s</button>
+            <button type="button" data-frame-video="reference" data-direction="-1">◀ Frame</button>
+            <button type="button" data-frame-video="reference" data-direction="1">Frame ▶</button>
+            <button type="button" data-step-video="reference" data-step="0.5">+0.5s</button>
+          </div>
+          <div class="video-options">
+            <label>Frame rate
+              <select id="referenceFps">
+                <option value="30" selected>30 fps</option>
+                <option value="60">60 fps</option>
+                <option value="120">120 fps</option>
+                <option value="24">24 fps</option>
+              </select>
+            </label>
+            <label>Playback
+              <select id="referenceSpeed">
+                <option value="0.25">0.25x</option>
+                <option value="0.5" selected>0.5x</option>
+                <option value="0.75">0.75x</option>
+                <option value="1">1x</option>
+              </select>
+            </label>
+          </div>
+          <p class="reference-note">Reference comparison is visual only. Compare sequence, posture, and blade timing rather than exact reach or rate.</p>
+        </article>
+      </div>
+
+      <div id="keyFramesSection" class="key-frames-section hidden">
+        <div class="subheading-row">
+          <div>
+            <h3>Key frames</h3>
+            <p class="muted">Click a saved frame to return to that point in the paddler video.</p>
+          </div>
+          <button id="clearFramesButton" class="text-button" type="button">Clear frames</button>
         </div>
-      </div>
-
-      <div class="form-grid">
-        <label>
-          <span>Paddler to review</span>
-          <input id="subjectInput" type="text" placeholder="e.g., closest paddler in pink cap" value="paddler closest to the camera" />
-        </label>
-
-        <label>
-          <span>Camera angle</span>
-          <select id="angleInput">
-            <option value="side">Mostly side view</option>
-            <option value="front-diagonal">Front diagonal</option>
-            <option value="rear-diagonal">Rear diagonal</option>
-            <option value="mixed">Mixed or moving camera</option>
-          </select>
-        </label>
-
-        <label>
-          <span>Coaching level</span>
-          <select id="levelInput">
-            <option value="development">Development paddler</option>
-            <option value="experienced" selected>Experienced club paddler</option>
-            <option value="race">Race crew</option>
-          </select>
-        </label>
-
-        <label>
-          <span>Feedback depth</span>
-          <select id="depthInput">
-            <option value="2" selected>Top 2 priorities</option>
-            <option value="1">Top priority only</option>
-            <option value="3">Top 3 priorities</option>
-          </select>
-        </label>
-      </div>
-
-      <label class="notes-label">
-        <span>Coach notes or context <small>(optional)</small></span>
-        <textarea id="notesInput" rows="3" placeholder="e.g., focus on front-end mechanics; do not prioritize exit yet"></textarea>
-      </label>
-
-      <div class="rubric">
-        <h3>Technique model used</h3>
-        <div class="rubric-grid">
-          <div><strong>Set-up</strong><span>Rotate into the set, long bottom arm, long spine, organized before catch.</span></div>
-          <div><strong>Catch</strong><span>Micro-hang/control, hinge and blade entry together, full burial before pressure.</span></div>
-          <div><strong>Pull</strong><span>Connect, top-arm drive, chest proud, derotate through hips and torso, return progressively toward tall.</span></div>
-          <div><strong>Exit/Recovery</strong><span>Quick release at the hip, relaxed forward recovery, set early for the next stroke.</span></div>
-        </div>
-      </div>
-
-      <div class="action-row">
-        <button id="analyzeButton" class="primary-button" type="button" disabled>Analyze stroke</button>
-        <button id="clearButton" class="text-button" type="button">Clear</button>
-        <span id="statusText" class="status-text" aria-live="polite"></span>
+        <div id="keyFrames" class="key-frame-strip"></div>
       </div>
     </section>
 
-    <section id="framePanel" class="panel hidden">
+    <section id="coachReview" class="panel hidden">
       <div class="section-heading compact">
-        <div>
-          <span class="step">4</span>
-          <h2>Frames being reviewed</h2>
-        </div>
+        <div><span class="step">4</span><h2>Coach observations</h2></div>
       </div>
-      <p class="muted">The app samples frames across the clip so the analysis can compare positions through multiple stroke cycles.</p>
-      <div id="frameStrip" class="frame-strip"></div>
+
+      <div class="form-grid review-info-grid">
+        <label>
+          <span>Paddler / identifier</span>
+          <input id="paddlerName" type="text" placeholder="e.g., Sarah, pink cap" />
+        </label>
+        <label>
+          <span>Feedback priorities</span>
+          <select id="priorityDepth">
+            <option value="1">Top 1 correction</option>
+            <option value="2" selected>Top 2 corrections</option>
+            <option value="3">Top 3 corrections</option>
+          </select>
+        </label>
+        <label>
+          <span>Camera angle</span>
+          <select id="cameraAngle">
+            <option>Side view</option>
+            <option>Front diagonal</option>
+            <option>Rear diagonal</option>
+            <option>Mixed / moving camera</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="selection-guide">
+        <strong>Select only what you can clearly see.</strong>
+        Strengths are optional. Corrections are prioritized in the order you select them. You can reorder them below before generating feedback.
+      </div>
+
+      <div id="phaseReview" class="phase-review"></div>
+
+      <section id="prioritySection" class="priority-builder hidden">
+        <div class="subheading-row">
+          <div>
+            <h3>Correction priority</h3>
+            <p class="muted">The first items will be used in the final feedback based on your selected depth.</p>
+          </div>
+        </div>
+        <div id="priorityBuilderList" class="priority-builder-list"></div>
+      </section>
+
+      <label class="notes-label">
+        <span>Additional coach note <small>(optional)</small></span>
+        <textarea id="coachNote" rows="3" placeholder="Add context that is specific to this paddler or practice session."></textarea>
+      </label>
+
+      <div class="action-row">
+        <button id="generateButton" class="primary-button" type="button">Generate standardized feedback</button>
+        <button id="resetSelectionsButton" class="text-button" type="button">Reset selections</button>
+        <span id="selectionStatus" class="status-text"></span>
+      </div>
     </section>
 
     <section id="resultPanel" class="panel result-panel hidden">
       <div class="result-header">
         <div>
-          <p class="eyebrow">COACHING FEEDBACK</p>
+          <p class="eyebrow">PADDLER FEEDBACK</p>
           <h2 id="resultTitle">Stroke review</h2>
         </div>
         <div class="result-actions">
@@ -169,19 +237,16 @@
         <div id="phaseGrid" class="phase-grid"></div>
       </div>
 
-      <div class="feedback-card">
+      <div id="drillsCard" class="feedback-card">
         <h3>Drills to use next</h3>
         <div id="drillsList" class="drill-list"></div>
       </div>
 
-      <div class="feedback-card subtle">
-        <h3>Confidence and limitations</h3>
-        <p id="confidenceText"></p>
-        <ul id="limitationsList"></ul>
+      <div id="coachNoteCard" class="feedback-card subtle hidden">
+        <h3>Coach note</h3>
+        <p id="coachNoteOutput"></p>
       </div>
     </section>
-
-
   </main>
 
   <script src="app.js"></script>
