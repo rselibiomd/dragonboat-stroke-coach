@@ -5,16 +5,28 @@ const els = {
   referencePreview: document.getElementById('referencePreview'),
   clipMeta: document.getElementById('clipMeta'),
   referenceMeta: document.getElementById('referenceMeta'),
-  analyzeButton: document.getElementById('analyzeButton'),
-  clearButton: document.getElementById('clearButton'),
-  statusText: document.getElementById('statusText'),
-  subjectInput: document.getElementById('subjectInput'),
-  angleInput: document.getElementById('angleInput'),
-  levelInput: document.getElementById('levelInput'),
-  depthInput: document.getElementById('depthInput'),
-  notesInput: document.getElementById('notesInput'),
-  framePanel: document.getElementById('framePanel'),
-  frameStrip: document.getElementById('frameStrip'),
+  reviewWorkspace: document.getElementById('reviewWorkspace'),
+  referenceCard: document.getElementById('referenceCard'),
+  clipTime: document.getElementById('clipTime'),
+  referenceTime: document.getElementById('referenceTime'),
+  clipFps: document.getElementById('clipFps'),
+  referenceFps: document.getElementById('referenceFps'),
+  clipSpeed: document.getElementById('clipSpeed'),
+  referenceSpeed: document.getElementById('referenceSpeed'),
+  keyFramesSection: document.getElementById('keyFramesSection'),
+  keyFrames: document.getElementById('keyFrames'),
+  clearFramesButton: document.getElementById('clearFramesButton'),
+  coachReview: document.getElementById('coachReview'),
+  phaseReview: document.getElementById('phaseReview'),
+  prioritySection: document.getElementById('prioritySection'),
+  priorityBuilderList: document.getElementById('priorityBuilderList'),
+  paddlerName: document.getElementById('paddlerName'),
+  priorityDepth: document.getElementById('priorityDepth'),
+  cameraAngle: document.getElementById('cameraAngle'),
+  coachNote: document.getElementById('coachNote'),
+  generateButton: document.getElementById('generateButton'),
+  resetSelectionsButton: document.getElementById('resetSelectionsButton'),
+  selectionStatus: document.getElementById('selectionStatus'),
   resultPanel: document.getElementById('resultPanel'),
   resultTitle: document.getElementById('resultTitle'),
   overallCard: document.getElementById('overallCard'),
@@ -23,23 +35,264 @@ const els = {
   prioritiesList: document.getElementById('prioritiesList'),
   phaseGrid: document.getElementById('phaseGrid'),
   drillsList: document.getElementById('drillsList'),
-  confidenceText: document.getElementById('confidenceText'),
-  limitationsList: document.getElementById('limitationsList'),
+  drillsCard: document.getElementById('drillsCard'),
+  coachNoteCard: document.getElementById('coachNoteCard'),
+  coachNoteOutput: document.getElementById('coachNoteOutput'),
   copyButton: document.getElementById('copyButton'),
   printButton: document.getElementById('printButton')
 };
 
 const state = {
-  clipFile: null,
-  referenceFile: null,
   clipUrl: null,
   referenceUrl: null,
-  clipFrames: [],
-  referenceFrames: [],
+  clipFile: null,
+  referenceFile: null,
+  markedFrames: {},
+  selectedStrengths: new Set(),
+  selectedCorrections: [],
   result: null
 };
 
-const BACKEND_URL = 'https://dragonboat-stroke-coach.rselibiomd.workers.dev';
+const phaseLabels = {
+  setup: 'Set-up',
+  catch: 'Catch',
+  pull: 'Pull',
+  exit: 'Exit / Recovery'
+};
+
+const drillBank = {
+  'Pause Before the Catch': {
+    purpose: 'Build patience and organization at the front of the stroke.',
+    how: 'Start just above the water. Take one controlled stroke, reset to the set position, then repeat. Build to short sets while keeping the front end calm.'
+  },
+  'Frankenstein': {
+    purpose: 'Create reach and power through rotation rather than arm movement.',
+    how: 'Keep the elbows straight and move the paddle through torso rotation plus hip and leg movement. Return to normal paddling while keeping the same body-led feel.'
+  },
+  'Catch and Pull': {
+    purpose: 'Separate blade burial from the start of pressure.',
+    how: 'Set at the front, bury the blade fully, then begin the pull. Use slow controlled strokes so the catch stays quiet.'
+  },
+  'Hang Time / Float it Back': {
+    purpose: 'Reduce a rushed recovery and help the paddler arrive set before the catch.',
+    how: 'Use a slower recovery and let the paddle float forward. Keep the boat running while the body and paddle organize for the next catch.'
+  },
+  'Push and Pull': {
+    purpose: 'Improve connection and the feeling of a loaded blade.',
+    how: 'Start fully buried at the front, pull through with good body mechanics, then keep the blade in the water and move it back to the front. Repeat several times.'
+  },
+  'Find Your Entry Point': {
+    purpose: 'Find a strong reachable catch position without overreaching.',
+    how: 'Move a fully buried blade forward through the water to the strongest catch point, note that position, then use it as the air reach target.'
+  },
+  'Tall Paddling': {
+    purpose: 'Reinforce long posture and breathing through the stroke.',
+    how: 'Contrast a compressed posture with a tall long-spine posture, then paddle while maintaining the taller body shape.'
+  }
+};
+
+const phases = {
+  setup: {
+    title: 'Set-up',
+    reminder: 'Rotate into the set. Long bottom arm. Long spine. Get organized before the catch.',
+    strengths: [
+      { id: 'setup-rotation-good', text: 'Good torso rotation into the set.' },
+      { id: 'setup-long-arm-good', text: 'Bottom arm stays long toward the catch.' },
+      { id: 'setup-posture-good', text: 'Maintains a long spine through the set-up.' },
+      { id: 'setup-control-good', text: 'Arrives at the front with good control before the catch.' }
+    ],
+    corrections: [
+      {
+        id: 'setup-more-rotation',
+        title: 'Create more of the set through rotation',
+        observation: 'The set-up could use more torso rotation, with some of the reach currently coming from the arms.',
+        correction: 'Rotate into the set and let the torso carry the bottom arm forward. Keep the arm long rather than reaching farther at the last second.',
+        cue: 'Rotate into the set.',
+        drill: 'Frankenstein'
+      },
+      {
+        id: 'setup-long-bottom-arm',
+        title: 'Keep the bottom arm long into the set',
+        observation: 'The bottom arm shortens as you approach the catch.',
+        correction: 'Establish the long bottom arm during the recovery and carry that structure into the set position.',
+        cue: 'Long bottom arm into the set.',
+        drill: 'Frankenstein'
+      },
+      {
+        id: 'setup-long-spine',
+        title: 'Maintain a longer spine at the front',
+        observation: 'The upper body compresses or rounds as you move into the set position.',
+        correction: 'Reach through rotation and a controlled hip position while keeping the spine long and the chest proud.',
+        cue: 'Stay long at the front.',
+        drill: 'Tall Paddling'
+      },
+      {
+        id: 'setup-rushed',
+        title: 'Get fully set before the catch',
+        observation: 'The recovery moves quickly into the catch without a clear moment of organization at the front.',
+        correction: 'Arrive at the set position first, then use a very small moment of control before initiating the catch. It should not become a visible stop.',
+        cue: 'Get set first.',
+        drill: 'Hang Time / Float it Back'
+      },
+      {
+        id: 'setup-overreach',
+        title: 'Avoid reaching past your strong position',
+        observation: 'The final part of the reach appears to come from overextending rather than maintaining a strong set position.',
+        correction: 'Use the strongest reachable set position. More length is not helpful if the spine, shoulder, or arm structure collapses.',
+        cue: 'Strong reach, not maximum reach.',
+        drill: 'Find Your Entry Point'
+      }
+    ]
+  },
+  catch: {
+    title: 'Catch',
+    reminder: 'From the set, hinge as the blade drops. Hinge and burial happen together. Bury before meaningful pressure.',
+    strengths: [
+      { id: 'catch-controlled-good', text: 'Catch is controlled and relatively quiet.' },
+      { id: 'catch-hinge-good', text: 'Hinge and blade entry happen together.' },
+      { id: 'catch-burial-good', text: 'Blade appears to establish a full catch before the power phase.' },
+      { id: 'catch-position-good', text: 'Maintains a strong body position as the blade enters.' }
+    ],
+    corrections: [
+      {
+        id: 'catch-rushed',
+        title: 'Calm down the catch',
+        observation: 'The catch looks rushed from the set position into blade entry.',
+        correction: 'Keep the small moment of control at the front, then initiate the catch with a coordinated hinge and blade drop.',
+        cue: 'Set, then hinge and bury.',
+        drill: 'Pause Before the Catch'
+      },
+      {
+        id: 'catch-hinge',
+        title: 'Use a clearer hinge into the catch',
+        observation: 'The body stays relatively upright while the blade enters.',
+        correction: 'From the set position, hinge forward from the hips as the blade drops. Keep the spine long and let the hinge and blade entry happen together.',
+        cue: 'Hinge and bury.',
+        drill: 'Catch and Pull'
+      },
+      {
+        id: 'catch-too-deep-hinge',
+        title: 'Control the depth of the hinge',
+        observation: 'The body drops very low into the catch and the chest begins to close toward the water.',
+        correction: 'Keep the hinge, but maintain a long spine and proud chest rather than diving down for extra reach.',
+        cue: 'Hinge, but stay long.',
+        drill: 'Tall Paddling'
+      },
+      {
+        id: 'catch-before-burial',
+        title: 'Bury before applying pressure',
+        observation: 'Pressure appears to begin while the blade is still entering the water.',
+        correction: 'Let the blade drop to a full catch first, then connect and begin the power phase.',
+        cue: 'Bury first, then go.',
+        drill: 'Catch and Pull'
+      },
+      {
+        id: 'catch-noisy',
+        title: 'Make the entry quieter',
+        observation: 'There is extra splash or disturbance at the front of the stroke.',
+        correction: 'Keep the set controlled and drop the blade cleanly with the hinge instead of attacking the water.',
+        cue: 'Quiet catch.',
+        drill: 'Catch and Pull'
+      }
+    ]
+  },
+  pull: {
+    title: 'Pull',
+    reminder: 'Connect, maintain top-arm drive, derotate through the hips and torso, and progressively return toward tall.',
+    strengths: [
+      { id: 'pull-top-arm-good', text: 'Good top-arm drive through the power phase.' },
+      { id: 'pull-derotation-good', text: 'Uses torso and hip derotation effectively through the pull.' },
+      { id: 'pull-long-arm-good', text: 'Bottom arm stays relatively long through the useful power phase.' },
+      { id: 'pull-posture-good', text: 'Maintains a long spine and proud chest through the pull.' }
+    ],
+    corrections: [
+      {
+        id: 'pull-derotate',
+        title: 'Derotate more clearly through the pull',
+        observation: 'There is room to use more torso and hip derotation after the blade connects.',
+        correction: 'Once connected, let the hips and torso progressively unwind while maintaining pressure on the blade.',
+        cue: 'Connect and derotate.',
+        drill: 'Frankenstein'
+      },
+      {
+        id: 'pull-stays-low',
+        title: 'Progressively return toward tall',
+        observation: 'The body remains folded forward for too much of the power phase.',
+        correction: 'After connection, derotate and progressively bring the torso back toward tall while keeping the chest proud and spine long.',
+        cue: 'Chest proud and derotate.',
+        drill: 'Tall Paddling'
+      },
+      {
+        id: 'pull-bottom-arm',
+        title: 'Reduce the late bottom-arm pull',
+        observation: 'The bottom elbow begins to bend and actively draw the paddle back later in the pull.',
+        correction: 'Keep the bottom arm connected to the body movement and let the torso and hips continue to drive the useful part of the stroke.',
+        cue: 'Body moves the paddle.',
+        drill: 'Frankenstein'
+      },
+      {
+        id: 'pull-connection',
+        title: 'Strengthen connection to the blade',
+        observation: 'The stroke could hold a more consistent loaded feel once the blade is buried.',
+        correction: 'Establish the blade first, then move the body against that connection instead of letting the paddle slip through the water.',
+        cue: 'Feel the heavy water.',
+        drill: 'Push and Pull'
+      },
+      {
+        id: 'pull-chest',
+        title: 'Keep the chest proud through the power phase',
+        observation: 'The shoulders and chest close as the pull develops.',
+        correction: 'Maintain a long spine and proud chest while derotating. Avoid crunching down to keep the stroke going.',
+        cue: 'Chest proud, stay long.',
+        drill: 'Tall Paddling'
+      }
+    ]
+  },
+  exit: {
+    title: 'Exit / Recovery',
+    reminder: 'Release quickly at the hip. Do not assume a long pull when the real issue is simply a delayed exit. Recover relaxed and set early.',
+    strengths: [
+      { id: 'exit-hip-good', text: 'Release begins around the hip.' },
+      { id: 'exit-quick-good', text: 'Blade comes out quickly and cleanly.' },
+      { id: 'exit-recovery-good', text: 'Recovery is relaxed and gives time to reset.' },
+      { id: 'exit-set-good', text: 'Paddle gets organized early during recovery.' }
+    ],
+    corrections: [
+      {
+        id: 'exit-late',
+        title: 'Make the exit quicker at the hip',
+        observation: 'The blade reaches the hip but stays buried too long before releasing.',
+        correction: 'Once the blade reaches the hip, release it quickly rather than allowing it to linger and travel behind you.',
+        cue: 'Quick out at the hip.',
+        drill: 'Hang Time / Float it Back'
+      },
+      {
+        id: 'exit-pull-past',
+        title: 'Finish the power before pulling behind the hip',
+        observation: 'The paddle continues to be actively drawn behind the hip before the release.',
+        correction: 'Finish useful pressure at the hip and transition immediately into the exit instead of squeezing extra length from the back of the stroke.',
+        cue: 'Finish at the hip.',
+        drill: 'Hang Time / Float it Back'
+      },
+      {
+        id: 'exit-awkward',
+        title: 'Clean up the exit path',
+        observation: 'The transition from the end of the pull into recovery looks awkward or indirect.',
+        correction: 'Keep the release compact. Once at the hip, get the blade clear and move forward into the recovery without extra movement behind the body.',
+        cue: 'Out and forward.',
+        drill: 'Hang Time / Float it Back'
+      },
+      {
+        id: 'exit-rushed-recovery',
+        title: 'Relax the recovery',
+        observation: 'The paddle rushes forward after the exit and the next set-up becomes compressed.',
+        correction: 'Use the recovery to reset the body and paddle early. Let the boat run while you organize for the next catch.',
+        cue: 'Let it run, set early.',
+        drill: 'Hang Time / Float it Back'
+      }
+    ]
+  }
+};
 
 function formatBytes(bytes) {
   if (!bytes) return '0 B';
@@ -48,246 +301,8 @@ function formatBytes(bytes) {
   return `${(bytes / (1024 ** i)).toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
 }
 
-function setStatus(text, type = 'normal') {
-  els.statusText.textContent = text;
-  els.statusText.style.color = type === 'error' ? 'var(--danger)' : type === 'ok' ? 'var(--accent-2)' : 'var(--muted)';
-}
-
 function revoke(url) {
   if (url) URL.revokeObjectURL(url);
-}
-
-function loadPreview(file, videoEl, metaEl, kind) {
-  if (!file) return;
-  if (kind === 'clip') {
-    revoke(state.clipUrl);
-    state.clipUrl = URL.createObjectURL(file);
-    state.clipFile = file;
-    videoEl.src = state.clipUrl;
-  } else {
-    revoke(state.referenceUrl);
-    state.referenceUrl = URL.createObjectURL(file);
-    state.referenceFile = file;
-    videoEl.src = state.referenceUrl;
-  }
-  videoEl.classList.remove('hidden');
-  metaEl.classList.remove('hidden');
-  metaEl.textContent = `${file.name} · ${formatBytes(file.size)}`;
-  els.analyzeButton.disabled = !state.clipFile;
-  state.result = null;
-  els.resultPanel.classList.add('hidden');
-}
-
-els.clipInput.addEventListener('change', e => loadPreview(e.target.files[0], els.clipPreview, els.clipMeta, 'clip'));
-els.referenceInput.addEventListener('change', e => loadPreview(e.target.files[0], els.referencePreview, els.referenceMeta, 'reference'));
-
-for (const [dropId, input] of [['clipDropZone', els.clipInput], ['referenceDropZone', els.referenceInput]]) {
-  const zone = document.getElementById(dropId);
-  ['dragenter', 'dragover'].forEach(eventName => zone.addEventListener(eventName, e => {
-    e.preventDefault();
-    zone.classList.add('dragging');
-  }));
-  ['dragleave', 'drop'].forEach(eventName => zone.addEventListener(eventName, e => {
-    e.preventDefault();
-    zone.classList.remove('dragging');
-  }));
-  zone.addEventListener('drop', e => {
-    const file = [...e.dataTransfer.files].find(f => f.type.startsWith('video/') || /\.(mov|mp4|m4v|webm)$/i.test(f.name));
-    if (!file) return;
-    const dt = new DataTransfer();
-    dt.items.add(file);
-    input.files = dt.files;
-    input.dispatchEvent(new Event('change', { bubbles: true }));
-  });
-}
-
-function waitFor(video, event) {
-  return new Promise((resolve, reject) => {
-    const onEvent = () => { cleanup(); resolve(); };
-    const onError = () => { cleanup(); reject(new Error('The browser could not decode this video. Try an H.264 MP4 clip.')); };
-    const cleanup = () => {
-      video.removeEventListener(event, onEvent);
-      video.removeEventListener('error', onError);
-    };
-    video.addEventListener(event, onEvent, { once: true });
-    video.addEventListener('error', onError, { once: true });
-  });
-}
-
-async function ensureLoaded(video) {
-  if (video.readyState >= 1 && Number.isFinite(video.duration)) return;
-  await waitFor(video, 'loadedmetadata');
-}
-
-async function seekVideo(video, time) {
-  if (Math.abs(video.currentTime - time) < 0.015) return;
-  video.currentTime = Math.max(0, Math.min(time, video.duration - 0.02));
-  await waitFor(video, 'seeked');
-}
-
-function captureFrame(video, maxWidth = 900, quality = 0.78) {
-  const ratio = video.videoHeight / video.videoWidth;
-  const width = Math.min(maxWidth, video.videoWidth || maxWidth);
-  const height = Math.max(1, Math.round(width * ratio));
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d', { alpha: false });
-  ctx.drawImage(video, 0, 0, width, height);
-  return canvas.toDataURL('image/jpeg', quality);
-}
-
-async function sampleFrames(video, desiredCount, label) {
-  await ensureLoaded(video);
-  const duration = video.duration;
-  if (!Number.isFinite(duration) || duration <= 0) throw new Error(`Could not read ${label} duration.`);
-
-  const start = Math.min(0.25, duration * 0.05);
-  const end = Math.max(start, duration - Math.min(0.25, duration * 0.05));
-  const count = Math.max(4, Math.min(desiredCount, Math.floor(duration * 2) || 4));
-  const times = Array.from({ length: count }, (_, i) => {
-    if (count === 1) return duration / 2;
-    return start + ((end - start) * i / (count - 1));
-  });
-
-  const frames = [];
-  const originalTime = video.currentTime;
-  const wasPaused = video.paused;
-  video.pause();
-
-  for (let i = 0; i < times.length; i++) {
-    setStatus(`Sampling ${label} frame ${i + 1} of ${times.length}...`);
-    await seekVideo(video, times[i]);
-    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-    frames.push({ time: Number(times[i].toFixed(2)), dataUrl: captureFrame(video) });
-  }
-
-  await seekVideo(video, Math.min(originalTime, Math.max(0, duration - 0.05))).catch(() => {});
-  if (!wasPaused) video.play().catch(() => {});
-  return frames;
-}
-
-function renderFrames(frames) {
-  els.frameStrip.innerHTML = '';
-  for (const frame of frames) {
-    const card = document.createElement('div');
-    card.className = 'frame-card';
-    const img = document.createElement('img');
-    img.src = frame.dataUrl;
-    img.alt = `Sampled frame at ${frame.time.toFixed(2)} seconds`;
-    const stamp = document.createElement('span');
-    stamp.textContent = `${frame.time.toFixed(2)}s`;
-    card.append(img, stamp);
-    els.frameStrip.appendChild(card);
-  }
-  els.framePanel.classList.remove('hidden');
-}
-
-function backendBase() {
-  return BACKEND_URL;
-}
-
-async function analyze() {
-  if (!state.clipFile) return;
-  const backend = backendBase();
-  els.analyzeButton.disabled = true;
-  els.resultPanel.classList.add('hidden');
-  try {
-    state.clipFrames = await sampleFrames(els.clipPreview, 12, 'paddler clip');
-    renderFrames(state.clipFrames);
-
-    state.referenceFrames = [];
-    if (state.referenceFile) {
-      state.referenceFrames = await sampleFrames(els.referencePreview, 8, 'reference clip');
-    }
-
-    setStatus('Sending sampled frames for coaching analysis...');
-    const response = await fetch(`${backend}/analyze`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        subject: els.subjectInput.value.trim() || 'paddler closest to the camera',
-        camera_angle: els.angleInput.value,
-        coaching_level: els.levelInput.value,
-        max_priorities: Number(els.depthInput.value),
-        coach_notes: els.notesInput.value.trim(),
-        clip_name: state.clipFile.name,
-        clip_frames: state.clipFrames,
-        reference_name: state.referenceFile?.name || '',
-        reference_frames: state.referenceFrames
-      })
-    });
-
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(payload.error || `Analysis failed with HTTP ${response.status}.`);
-    state.result = payload;
-    renderResult(payload);
-    setStatus('Analysis complete.', 'ok');
-  } catch (error) {
-    console.error(error);
-    setStatus(error.message || 'Analysis failed.', 'error');
-  } finally {
-    els.analyzeButton.disabled = !state.clipFile;
-  }
-}
-
-function addListItems(list, items) {
-  list.innerHTML = '';
-  for (const item of items || []) {
-    const li = document.createElement('li');
-    li.textContent = item;
-    list.appendChild(li);
-  }
-}
-
-function renderResult(result) {
-  els.resultTitle.textContent = result.title || 'Stroke review';
-  els.overallCard.innerHTML = `<h3>Overall assessment</h3><p>${escapeHtml(result.overall_assessment || '')}</p>`;
-  addListItems(els.strengthsList, result.strengths);
-  addListItems(els.cuesList, result.cues);
-
-  els.prioritiesList.innerHTML = '';
-  for (const p of result.priority_corrections || []) {
-    const div = document.createElement('div');
-    div.className = 'priority-item';
-    div.innerHTML = `
-      <h4>${escapeHtml(p.title)}</h4>
-      <p><strong>Observation:</strong> ${escapeHtml(p.observation)}</p>
-      <p><strong>Why it matters:</strong> ${escapeHtml(p.why_it_matters)}</p>
-      <p><strong>Correction:</strong> ${escapeHtml(p.correction)}</p>
-      <p class="cue">Cue: “${escapeHtml(p.cue)}”</p>
-      ${p.evidence_times?.length ? `<p class="evidence">Visible around: ${p.evidence_times.map(t => `${Number(t).toFixed(2)}s`).join(', ')}</p>` : ''}
-    `;
-    els.prioritiesList.appendChild(div);
-  }
-
-  const phases = result.phase_feedback || {};
-  const labels = [
-    ['setup', 'Set-up'],
-    ['catch', 'Catch'],
-    ['pull', 'Pull'],
-    ['exit_recovery', 'Exit / Recovery']
-  ];
-  els.phaseGrid.innerHTML = '';
-  for (const [key, label] of labels) {
-    const div = document.createElement('div');
-    div.className = 'phase-item';
-    div.innerHTML = `<strong>${label}</strong><span>${escapeHtml(phases[key] || 'Not enough evidence to assess confidently.')}</span>`;
-    els.phaseGrid.appendChild(div);
-  }
-
-  els.drillsList.innerHTML = '';
-  for (const d of result.drills || []) {
-    const div = document.createElement('div');
-    div.className = 'drill-item';
-    div.innerHTML = `<strong>${escapeHtml(d.name)}</strong><p>${escapeHtml(d.purpose)}</p><p>${escapeHtml(d.how_to)}</p>`;
-    els.drillsList.appendChild(div);
-  }
-
-  els.confidenceText.textContent = result.confidence || '';
-  addListItems(els.limitationsList, result.limitations);
-  els.resultPanel.classList.remove('hidden');
-  els.resultPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function escapeHtml(value = '') {
@@ -299,52 +314,423 @@ function escapeHtml(value = '') {
     .replaceAll("'", '&#039;');
 }
 
-function resultAsText() {
-  if (!state.result) return '';
-  const r = state.result;
-  const lines = [
-    r.title || 'Dragonboat stroke review',
-    '',
-    'Overall assessment',
-    r.overall_assessment || '',
-    '',
-    'What is working',
-    ...(r.strengths || []).map(x => `- ${x}`),
-    '',
-    'Priority corrections'
-  ];
-  for (const p of r.priority_corrections || []) {
-    lines.push(`- ${p.title}: ${p.observation}`);
-    lines.push(`  Correction: ${p.correction}`);
-    lines.push(`  Cue: ${p.cue}`);
+function loadVideo(file, kind) {
+  if (!file) return;
+  const isClip = kind === 'clip';
+  const video = isClip ? els.clipPreview : els.referencePreview;
+  const meta = isClip ? els.clipMeta : els.referenceMeta;
+  if (isClip) {
+    revoke(state.clipUrl);
+    state.clipUrl = URL.createObjectURL(file);
+    state.clipFile = file;
+    state.markedFrames = {};
+    renderKeyFrames();
+  } else {
+    revoke(state.referenceUrl);
+    state.referenceUrl = URL.createObjectURL(file);
+    state.referenceFile = file;
   }
-  lines.push('', 'Simple cues', ...(r.cues || []).map(x => `- ${x}`));
-  lines.push('', 'Drills');
-  for (const d of r.drills || []) lines.push(`- ${d.name}: ${d.purpose}. ${d.how_to}`);
-  lines.push('', 'Confidence and limitations', r.confidence || '', ...(r.limitations || []).map(x => `- ${x}`));
-  return lines.join('\n');
+  video.src = isClip ? state.clipUrl : state.referenceUrl;
+  video.load();
+  meta.textContent = `${file.name} · ${formatBytes(file.size)}`;
+  meta.classList.remove('hidden');
+  if (isClip) {
+    els.reviewWorkspace.classList.remove('hidden');
+    els.coachReview.classList.remove('hidden');
+  } else {
+    els.referenceCard.classList.remove('hidden');
+  }
 }
 
-els.analyzeButton.addEventListener('click', analyze);
-els.clearButton.addEventListener('click', () => {
-  revoke(state.clipUrl); revoke(state.referenceUrl);
-  Object.assign(state, { clipFile: null, referenceFile: null, clipUrl: null, referenceUrl: null, clipFrames: [], referenceFrames: [], result: null });
-  els.clipInput.value = ''; els.referenceInput.value = '';
-  els.clipPreview.removeAttribute('src'); els.referencePreview.removeAttribute('src');
-  els.clipPreview.classList.add('hidden'); els.referencePreview.classList.add('hidden');
-  els.clipMeta.classList.add('hidden'); els.referenceMeta.classList.add('hidden');
-  els.framePanel.classList.add('hidden'); els.resultPanel.classList.add('hidden');
-  els.analyzeButton.disabled = true;
-  setStatus('');
+els.clipInput.addEventListener('change', e => loadVideo(e.target.files[0], 'clip'));
+els.referenceInput.addEventListener('change', e => loadVideo(e.target.files[0], 'reference'));
+
+for (const [dropId, input] of [['clipDropZone', els.clipInput], ['referenceDropZone', els.referenceInput]]) {
+  const zone = document.getElementById(dropId);
+  ['dragenter', 'dragover'].forEach(name => zone.addEventListener(name, e => {
+    e.preventDefault();
+    zone.classList.add('dragging');
+  }));
+  ['dragleave', 'drop'].forEach(name => zone.addEventListener(name, e => {
+    e.preventDefault();
+    zone.classList.remove('dragging');
+  }));
+  zone.addEventListener('drop', e => {
+    const file = [...e.dataTransfer.files].find(f => f.type.startsWith('video/') || /\.(mov|mp4|m4v|webm)$/i.test(f.name));
+    if (!file) return;
+    loadVideo(file, input === els.clipInput ? 'clip' : 'reference');
+  });
+}
+
+function updateTime(video, target) {
+  target.textContent = `${(video.currentTime || 0).toFixed(2)}s`;
+}
+
+els.clipPreview.addEventListener('timeupdate', () => updateTime(els.clipPreview, els.clipTime));
+els.referencePreview.addEventListener('timeupdate', () => updateTime(els.referencePreview, els.referenceTime));
+els.clipPreview.addEventListener('loadedmetadata', () => updateTime(els.clipPreview, els.clipTime));
+els.referencePreview.addEventListener('loadedmetadata', () => updateTime(els.referencePreview, els.referenceTime));
+
+els.clipSpeed.addEventListener('change', () => { els.clipPreview.playbackRate = Number(els.clipSpeed.value); });
+els.referenceSpeed.addEventListener('change', () => { els.referencePreview.playbackRate = Number(els.referenceSpeed.value); });
+els.clipPreview.playbackRate = Number(els.clipSpeed.value);
+els.referencePreview.playbackRate = Number(els.referenceSpeed.value);
+
+function getVideo(kind) {
+  return kind === 'clip' ? els.clipPreview : els.referencePreview;
+}
+
+function getFps(kind) {
+  return Number(kind === 'clip' ? els.clipFps.value : els.referenceFps.value) || 30;
+}
+
+function nudgeVideo(kind, seconds) {
+  const video = getVideo(kind);
+  video.pause();
+  const duration = Number.isFinite(video.duration) ? video.duration : Infinity;
+  video.currentTime = Math.max(0, Math.min(video.currentTime + seconds, Math.max(0, duration - 0.001)));
+}
+
+document.querySelectorAll('[data-step-video]').forEach(button => {
+  button.addEventListener('click', () => nudgeVideo(button.dataset.stepVideo, Number(button.dataset.step)));
 });
+
+document.querySelectorAll('[data-frame-video]').forEach(button => {
+  button.addEventListener('click', () => {
+    const kind = button.dataset.frameVideo;
+    nudgeVideo(kind, Number(button.dataset.direction) / getFps(kind));
+  });
+});
+
+function captureFrame(video) {
+  if (!video.videoWidth || !video.videoHeight) return null;
+  const maxWidth = 720;
+  const width = Math.min(maxWidth, video.videoWidth);
+  const height = Math.round(width * video.videoHeight / video.videoWidth);
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d', { alpha: false });
+  ctx.drawImage(video, 0, 0, width, height);
+  return canvas.toDataURL('image/jpeg', 0.82);
+}
+
+document.querySelectorAll('[data-mark-phase]').forEach(button => {
+  button.addEventListener('click', () => {
+    const phase = button.dataset.markPhase;
+    const dataUrl = captureFrame(els.clipPreview);
+    if (!dataUrl) return;
+    state.markedFrames[phase] = {
+      phase,
+      time: Number(els.clipPreview.currentTime.toFixed(3)),
+      dataUrl
+    };
+    renderKeyFrames();
+  });
+});
+
+function renderKeyFrames() {
+  els.keyFrames.innerHTML = '';
+  const frames = Object.values(state.markedFrames);
+  els.keyFramesSection.classList.toggle('hidden', frames.length === 0);
+  for (const key of ['setup', 'catch', 'pull', 'exit']) {
+    const frame = state.markedFrames[key];
+    if (!frame) continue;
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'key-frame-card';
+    card.innerHTML = `<img src="${frame.dataUrl}" alt="${phaseLabels[key]} frame"><span><strong>${phaseLabels[key]}</strong>${frame.time.toFixed(2)}s</span>`;
+    card.addEventListener('click', () => {
+      els.clipPreview.pause();
+      els.clipPreview.currentTime = frame.time;
+      els.clipPreview.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    els.keyFrames.appendChild(card);
+  }
+}
+
+els.clearFramesButton.addEventListener('click', () => {
+  state.markedFrames = {};
+  renderKeyFrames();
+});
+
+function buildPhaseReview() {
+  els.phaseReview.innerHTML = '';
+  for (const [phaseKey, phase] of Object.entries(phases)) {
+    const section = document.createElement('section');
+    section.className = 'phase-review-card';
+    section.innerHTML = `
+      <div class="phase-review-heading">
+        <div><span class="phase-kicker">${phase.title}</span><h3>${phase.title}</h3></div>
+        <p>${phase.reminder}</p>
+      </div>
+      <div class="observation-columns">
+        <div>
+          <h4>What is working</h4>
+          <div class="option-list strengths-options"></div>
+        </div>
+        <div>
+          <h4>Needs work</h4>
+          <div class="option-list correction-options"></div>
+        </div>
+      </div>
+    `;
+    const strengthBox = section.querySelector('.strengths-options');
+    phase.strengths.forEach(item => {
+      strengthBox.appendChild(makeOption(item.id, item.text, 'strength', phaseKey));
+    });
+    const correctionBox = section.querySelector('.correction-options');
+    phase.corrections.forEach(item => {
+      correctionBox.appendChild(makeOption(item.id, item.title, 'correction', phaseKey));
+    });
+    els.phaseReview.appendChild(section);
+  }
+}
+
+function makeOption(id, text, type, phaseKey) {
+  const label = document.createElement('label');
+  label.className = `check-option ${type}`;
+  const input = document.createElement('input');
+  input.type = 'checkbox';
+  input.dataset.optionId = id;
+  input.dataset.optionType = type;
+  input.dataset.phase = phaseKey;
+  const span = document.createElement('span');
+  span.textContent = text;
+  label.append(input, span);
+  input.addEventListener('change', () => handleOptionChange(input));
+  return label;
+}
+
+function handleOptionChange(input) {
+  const id = input.dataset.optionId;
+  if (input.dataset.optionType === 'strength') {
+    input.checked ? state.selectedStrengths.add(id) : state.selectedStrengths.delete(id);
+  } else {
+    if (input.checked) {
+      if (!state.selectedCorrections.includes(id)) state.selectedCorrections.push(id);
+    } else {
+      state.selectedCorrections = state.selectedCorrections.filter(x => x !== id);
+    }
+    renderPriorityBuilder();
+  }
+  updateSelectionStatus();
+}
+
+function getCorrectionById(id) {
+  for (const [phaseKey, phase] of Object.entries(phases)) {
+    const item = phase.corrections.find(x => x.id === id);
+    if (item) return { ...item, phaseKey, phaseTitle: phase.title };
+  }
+  return null;
+}
+
+function getStrengthById(id) {
+  for (const [phaseKey, phase] of Object.entries(phases)) {
+    const item = phase.strengths.find(x => x.id === id);
+    if (item) return { ...item, phaseKey, phaseTitle: phase.title };
+  }
+  return null;
+}
+
+function movePriority(index, direction) {
+  const next = index + direction;
+  if (next < 0 || next >= state.selectedCorrections.length) return;
+  [state.selectedCorrections[index], state.selectedCorrections[next]] = [state.selectedCorrections[next], state.selectedCorrections[index]];
+  renderPriorityBuilder();
+}
+
+function renderPriorityBuilder() {
+  els.priorityBuilderList.innerHTML = '';
+  els.prioritySection.classList.toggle('hidden', state.selectedCorrections.length === 0);
+  state.selectedCorrections.forEach((id, index) => {
+    const correction = getCorrectionById(id);
+    if (!correction) return;
+    const row = document.createElement('div');
+    row.className = 'priority-builder-item';
+    row.innerHTML = `
+      <span class="priority-number">${index + 1}</span>
+      <div class="priority-builder-copy"><strong>${correction.title}</strong><span>${correction.phaseTitle}</span></div>
+      <div class="priority-move-buttons">
+        <button type="button" aria-label="Move up" ${index === 0 ? 'disabled' : ''}>↑</button>
+        <button type="button" aria-label="Move down" ${index === state.selectedCorrections.length - 1 ? 'disabled' : ''}>↓</button>
+      </div>
+    `;
+    const buttons = row.querySelectorAll('button');
+    buttons[0].addEventListener('click', () => movePriority(index, -1));
+    buttons[1].addEventListener('click', () => movePriority(index, 1));
+    els.priorityBuilderList.appendChild(row);
+  });
+}
+
+function updateSelectionStatus() {
+  const correctionCount = state.selectedCorrections.length;
+  const strengthCount = state.selectedStrengths.size;
+  els.selectionStatus.textContent = `${strengthCount} strength${strengthCount === 1 ? '' : 's'}, ${correctionCount} correction${correctionCount === 1 ? '' : 's'} selected.`;
+}
+
+function resetSelections() {
+  state.selectedStrengths.clear();
+  state.selectedCorrections = [];
+  document.querySelectorAll('[data-option-id]').forEach(input => { input.checked = false; });
+  renderPriorityBuilder();
+  updateSelectionStatus();
+  els.resultPanel.classList.add('hidden');
+}
+
+els.resetSelectionsButton.addEventListener('click', resetSelections);
+
+function phaseSummary(phaseKey, selectedCorrections, selectedStrengths) {
+  const phase = phases[phaseKey];
+  const corrections = selectedCorrections.filter(x => x.phaseKey === phaseKey);
+  const strengths = selectedStrengths.filter(x => x.phaseKey === phaseKey);
+  if (!corrections.length && !strengths.length) return 'No specific observation selected.';
+  const pieces = [];
+  if (strengths.length) pieces.push(strengths.map(x => x.text).join(' '));
+  if (corrections.length) pieces.push(corrections.map(x => x.correction).join(' '));
+  return pieces.join(' ');
+}
+
+function generateFeedback() {
+  const depth = Number(els.priorityDepth.value) || 2;
+  const allCorrections = state.selectedCorrections.map(getCorrectionById).filter(Boolean);
+  const priorities = allCorrections.slice(0, depth);
+  const strengths = [...state.selectedStrengths].map(getStrengthById).filter(Boolean);
+
+  if (!priorities.length) {
+    els.selectionStatus.textContent = 'Select at least one correction before generating feedback.';
+    els.selectionStatus.style.color = 'var(--warning)';
+    return;
+  }
+  els.selectionStatus.style.color = '';
+
+  const name = els.paddlerName.value.trim();
+  const introName = name ? `${name}, ` : '';
+  const strengthIntro = strengths.length
+    ? `There are already some good pieces in your stroke, especially ${strengths.slice(0, 2).map(x => x.text.toLowerCase().replace(/\.$/, '')).join(' and ')}.`
+    : 'You have a solid base to work from.';
+  const priorityNames = priorities.map(x => x.title.toLowerCase());
+  const prioritySentence = priorityNames.length === 1
+    ? `The main thing to work on now is ${priorityNames[0]}.`
+    : `The main things to work on now are ${priorityNames.slice(0, -1).join(', ')} and ${priorityNames.at(-1)}.`;
+  const overall = `${introName}${strengthIntro} ${prioritySentence}`;
+
+  const cues = [...new Set(priorities.map(x => x.cue))];
+  const drillNames = [...new Set(priorities.map(x => x.drill).filter(Boolean))];
+  const phaseFeedback = {};
+  for (const phaseKey of Object.keys(phases)) phaseFeedback[phaseKey] = phaseSummary(phaseKey, allCorrections, strengths);
+
+  state.result = {
+    title: name ? `${name} - Stroke Review` : 'Dragonboat Stroke Review',
+    overall,
+    strengths: strengths.map(x => `${x.phaseTitle}: ${x.text}`),
+    priorities,
+    cues,
+    drills: drillNames.map(name => ({ name, ...drillBank[name] })),
+    phaseFeedback,
+    note: els.coachNote.value.trim(),
+    cameraAngle: els.cameraAngle.value
+  };
+
+  renderResult(state.result);
+}
+
+els.generateButton.addEventListener('click', generateFeedback);
+
+function addListItems(list, items, emptyText = 'No strengths selected.') {
+  list.innerHTML = '';
+  if (!items?.length) {
+    const li = document.createElement('li');
+    li.className = 'muted';
+    li.textContent = emptyText;
+    list.appendChild(li);
+    return;
+  }
+  items.forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = item;
+    list.appendChild(li);
+  });
+}
+
+function renderResult(result) {
+  els.resultTitle.textContent = result.title;
+  els.overallCard.innerHTML = `<h3>Overall assessment</h3><p>${escapeHtml(result.overall)}</p>`;
+  addListItems(els.strengthsList, result.strengths);
+  addListItems(els.cuesList, result.cues, 'Use the priority corrections below.');
+
+  els.prioritiesList.innerHTML = '';
+  result.priorities.forEach((p, index) => {
+    const frame = state.markedFrames[p.phaseKey];
+    const div = document.createElement('article');
+    div.className = 'priority-item';
+    div.innerHTML = `
+      <div class="priority-heading"><span>${index + 1}</span><div><small>${p.phaseTitle}</small><h4>${escapeHtml(p.title)}</h4></div></div>
+      <p>${escapeHtml(p.observation)}</p>
+      <p><strong>Work on:</strong> ${escapeHtml(p.correction)}</p>
+      <p class="cue">Cue: “${escapeHtml(p.cue)}”</p>
+      ${frame ? `<p class="evidence">Marked ${p.phaseTitle} frame: ${frame.time.toFixed(2)}s</p>` : ''}
+    `;
+    els.prioritiesList.appendChild(div);
+  });
+
+  els.phaseGrid.innerHTML = '';
+  for (const [phaseKey, phase] of Object.entries(phases)) {
+    const div = document.createElement('div');
+    div.className = 'phase-item';
+    div.innerHTML = `<strong>${phase.title}</strong><span>${escapeHtml(result.phaseFeedback[phaseKey])}</span>`;
+    els.phaseGrid.appendChild(div);
+  }
+
+  els.drillsList.innerHTML = '';
+  result.drills.forEach(d => {
+    const div = document.createElement('div');
+    div.className = 'drill-item';
+    div.innerHTML = `<strong>${escapeHtml(d.name)}</strong><p>${escapeHtml(d.purpose)}</p><p>${escapeHtml(d.how)}</p>`;
+    els.drillsList.appendChild(div);
+  });
+  els.drillsCard.classList.toggle('hidden', result.drills.length === 0);
+
+  els.coachNoteCard.classList.toggle('hidden', !result.note);
+  els.coachNoteOutput.textContent = result.note;
+  els.resultPanel.classList.remove('hidden');
+  els.resultPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resultAsText() {
+  const r = state.result;
+  if (!r) return '';
+  const lines = [r.title, '', r.overall, ''];
+  if (r.strengths.length) {
+    lines.push('What is working', ...r.strengths.map(x => `- ${x}`), '');
+  }
+  lines.push('Priority corrections');
+  r.priorities.forEach((p, i) => {
+    lines.push(`${i + 1}. ${p.title}`);
+    lines.push(p.observation);
+    lines.push(`Work on: ${p.correction}`);
+    lines.push(`Cue: ${p.cue}`, '');
+  });
+  lines.push('Simple cues', ...r.cues.map(x => `- ${x}`));
+  if (r.drills.length) {
+    lines.push('', 'Drills to use next');
+    r.drills.forEach(d => lines.push(`- ${d.name}: ${d.purpose} ${d.how}`));
+  }
+  if (r.note) lines.push('', 'Coach note', r.note);
+  return lines.join('\n');
+}
 
 els.copyButton.addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(resultAsText());
     els.copyButton.textContent = 'Copied';
-    setTimeout(() => els.copyButton.textContent = 'Copy feedback', 1200);
+    setTimeout(() => { els.copyButton.textContent = 'Copy feedback'; }, 1200);
   } catch {
-    setStatus('Could not copy automatically. Select the text manually.', 'error');
+    window.prompt('Copy the feedback below:', resultAsText());
   }
 });
+
 els.printButton.addEventListener('click', () => window.print());
+
+buildPhaseReview();
+updateSelectionStatus();
