@@ -7,6 +7,7 @@
   <title>KDBC Dragonboat Stroke Review</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="release.css" />
+  <link rel="stylesheet" href="player.css" />
 </head>
 <body>
   <main class="app-shell">
@@ -58,12 +59,17 @@
       <p class="muted workspace-intro">Pause the video and step through the stroke. Frame stepping is approximate, so choose the recording frame rate that best matches your clip.</p>
 
       <div class="video-workspace" id="videoWorkspace">
-        <article class="video-review-card">
+        <article class="video-review-card" id="clipPlayerCard">
           <div class="video-card-heading">
             <strong>Paddler clip</strong>
-            <span id="clipTime" class="time-readout">0.00s</span>
           </div>
-          <video id="clipPreview" class="review-video" controls muted playsinline></video>
+          <video id="clipPreview" class="review-video" muted playsinline></video>
+          <div class="external-player-controls">
+            <button type="button" data-play-video="clip" class="player-button">Play</button>
+            <input type="range" data-seek-video="clip" class="player-seek" min="0" max="0" step="0.001" value="0" aria-label="Paddler video timeline" />
+            <div class="player-time"><span id="clipTime">0:00.00</span><span>/</span><span id="clipDuration">0:00.00</span></div>
+            <button type="button" data-fullscreen-video="clip" class="player-button">Fullscreen</button>
+          </div>
           <div class="scrub-controls">
             <button type="button" data-step-video="clip" data-step="-0.5">-0.5s</button>
             <button type="button" data-frame-video="clip" data-direction="-1">◀ Frame</button>
@@ -99,12 +105,17 @@
           </div>
         </article>
 
-        <article id="referenceCard" class="video-review-card hidden">
+        <article id="referencePlayerCard" class="video-review-card hidden">
           <div class="video-card-heading">
             <strong>Reference clip</strong>
-            <span id="referenceTime" class="time-readout">0.00s</span>
           </div>
-          <video id="referencePreview" class="review-video" controls muted playsinline></video>
+          <video id="referencePreview" class="review-video" muted playsinline></video>
+          <div class="external-player-controls">
+            <button type="button" data-play-video="reference" class="player-button">Play</button>
+            <input type="range" data-seek-video="reference" class="player-seek" min="0" max="0" step="0.001" value="0" aria-label="Reference video timeline" />
+            <div class="player-time"><span id="referenceTime">0:00.00</span><span>/</span><span id="referenceDuration">0:00.00</span></div>
+            <button type="button" data-fullscreen-video="reference" class="player-button">Fullscreen</button>
+          </div>
           <div class="scrub-controls">
             <button type="button" data-step-video="reference" data-step="-0.5">-0.5s</button>
             <button type="button" data-frame-video="reference" data-direction="-1">◀ Frame</button>
@@ -252,5 +263,6 @@
 
   <script src="app.js"></script>
   <script src="release.js"></script>
+  <script src="player.js"></script>
 </body>
 </html>
