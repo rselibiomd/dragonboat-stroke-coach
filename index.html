@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a1020" />
+  <title>Dragonboat Stroke Coach</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">KDBC COACHING TOOL</p>
+        <h1>Dragonboat Stroke Coach</h1>
+        <p class="hero-copy">Upload a short paddling clip, optionally add a reference clip, and get focused technical feedback on Set-up, Catch, Pull, and Exit/Recovery.</p>
+      </div>
+    </header>
+
+    <section class="notice" aria-label="Important note">
+      <strong>Coach-first analysis.</strong>
+      The tool prioritizes the clearest 1 to 3 corrections and avoids inventing issues that are not visible from the camera angle.
+    </section>
+
+    <section class="panel upload-grid">
+      <div class="upload-card">
+        <div class="section-heading">
+          <div>
+            <span class="step">1</span>
+            <h2>Paddler clip</h2>
+          </div>
+          <span class="required">Required</span>
+        </div>
+        <label class="drop-zone" id="clipDropZone">
+          <input id="clipInput" type="file" accept="video/*,.mov,.mp4,.m4v,.webm" />
+          <span class="drop-title">Choose a short video</span>
+          <span class="drop-subtitle">Best with 5 to 20 seconds and a clear side or diagonal view.</span>
+        </label>
+        <video id="clipPreview" class="video-preview hidden" controls muted playsinline></video>
+        <div id="clipMeta" class="file-meta hidden"></div>
+      </div>
+
+      <div class="upload-card">
+        <div class="section-heading">
+          <div>
+            <span class="step">2</span>
+            <h2>Reference clip</h2>
+          </div>
+          <span class="optional">Optional</span>
+        </div>
+        <label class="drop-zone secondary" id="referenceDropZone">
+          <input id="referenceInput" type="file" accept="video/*,.mov,.mp4,.m4v,.webm" />
+          <span class="drop-title">Add a technique reference</span>
+          <span class="drop-subtitle">For example, the Montreal race clip. The model compares body sequence, not stroke rate.</span>
+        </label>
+        <video id="referencePreview" class="video-preview hidden" controls muted playsinline></video>
+        <div id="referenceMeta" class="file-meta hidden"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading compact">
+        <div>
+          <span class="step">3</span>
+          <h2>Analysis target</h2>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <label>
+          <span>Paddler to review</span>
+          <input id="subjectInput" type="text" placeholder="e.g., closest paddler in pink cap" value="paddler closest to the camera" />
+        </label>
+
+        <label>
+          <span>Camera angle</span>
+          <select id="angleInput">
+            <option value="side">Mostly side view</option>
+            <option value="front-diagonal">Front diagonal</option>
+            <option value="rear-diagonal">Rear diagonal</option>
+            <option value="mixed">Mixed or moving camera</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Coaching level</span>
+          <select id="levelInput">
+            <option value="development">Development paddler</option>
+            <option value="experienced" selected>Experienced club paddler</option>
+            <option value="race">Race crew</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Feedback depth</span>
+          <select id="depthInput">
+            <option value="2" selected>Top 2 priorities</option>
+            <option value="1">Top priority only</option>
+            <option value="3">Top 3 priorities</option>
+          </select>
+        </label>
+      </div>
+
+      <label class="notes-label">
+        <span>Coach notes or context <small>(optional)</small></span>
+        <textarea id="notesInput" rows="3" placeholder="e.g., focus on front-end mechanics; do not prioritize exit yet"></textarea>
+      </label>
+
+      <div class="rubric">
+        <h3>Technique model used</h3>
+        <div class="rubric-grid">
+          <div><strong>Set-up</strong><span>Rotate into the set, long bottom arm, long spine, organized before catch.</span></div>
+          <div><strong>Catch</strong><span>Micro-hang/control, hinge and blade entry together, full burial before pressure.</span></div>
+          <div><strong>Pull</strong><span>Connect, top-arm drive, chest proud, derotate through hips and torso, return progressively toward tall.</span></div>
+          <div><strong>Exit/Recovery</strong><span>Quick release at the hip, relaxed forward recovery, set early for the next stroke.</span></div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button id="analyzeButton" class="primary-button" type="button" disabled>Analyze stroke</button>
+        <button id="clearButton" class="text-button" type="button">Clear</button>
+        <span id="statusText" class="status-text" aria-live="polite"></span>
+      </div>
+    </section>
+
+    <section id="framePanel" class="panel hidden">
+      <div class="section-heading compact">
+        <div>
+          <span class="step">4</span>
+          <h2>Frames being reviewed</h2>
+        </div>
+      </div>
+      <p class="muted">The app samples frames across the clip so the analysis can compare positions through multiple stroke cycles.</p>
+      <div id="frameStrip" class="frame-strip"></div>
+    </section>
+
+    <section id="resultPanel" class="panel result-panel hidden">
+      <div class="result-header">
+        <div>
+          <p class="eyebrow">COACHING FEEDBACK</p>
+          <h2 id="resultTitle">Stroke review</h2>
+        </div>
+        <div class="result-actions">
+          <button id="copyButton" class="ghost-button" type="button">Copy feedback</button>
+          <button id="printButton" class="ghost-button" type="button">Print</button>
+        </div>
+      </div>
+
+      <div id="overallCard" class="feedback-card emphasis"></div>
+
+      <div class="two-column">
+        <div class="feedback-card">
+          <h3>What is working</h3>
+          <ul id="strengthsList"></ul>
+        </div>
+        <div class="feedback-card">
+          <h3>Simple cues</h3>
+          <ul id="cuesList" class="cue-list"></ul>
+        </div>
+      </div>
+
+      <div class="feedback-card">
+        <h3>Priority corrections</h3>
+        <div id="prioritiesList" class="priority-list"></div>
+      </div>
+
+      <div class="feedback-card">
+        <h3>Stroke phase review</h3>
+        <div id="phaseGrid" class="phase-grid"></div>
+      </div>
+
+      <div class="feedback-card">
+        <h3>Drills to use next</h3>
+        <div id="drillsList" class="drill-list"></div>
+      </div>
+
+      <div class="feedback-card subtle">
+        <h3>Confidence and limitations</h3>
+        <p id="confidenceText"></p>
+        <ul id="limitationsList"></ul>
+      </div>
+    </section>
+
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
