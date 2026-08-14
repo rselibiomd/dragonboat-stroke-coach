@@ -1,42 +1,12 @@
 /* External player controls and review-card fullscreen */
 
-// Preserve the original reference-card ID expected by app.js and release.js.
-const playerReferenceCard = document.getElementById('referencePlayerCard');
-if (playerReferenceCard) playerReferenceCard.id = 'referenceCard';
-
-// app.js captured the old reference-card lookup before the compatibility rename above.
-// Replace only the reference branch of loadVideo so existing upload behavior remains intact.
-if (typeof loadVideo === 'function') {
-  const originalLoadVideo = loadVideo;
-  loadVideo = function compatibleLoadVideo(file, kind) {
-    if (kind !== 'reference') return originalLoadVideo(file, kind);
-    if (!file) return;
-
-    revoke(state.referenceUrl);
-    state.referenceUrl = URL.createObjectURL(file);
-    state.referenceFile = file;
-    els.referencePreview.src = state.referenceUrl;
-    els.referencePreview.load();
-    els.referenceMeta.textContent = `${file.name} · ${formatBytes(file.size)}`;
-    els.referenceMeta.classList.remove('hidden');
-    document.getElementById('referenceCard')?.classList.remove('hidden');
-
-    releaseState.referenceMarks = {};
-    renderReferenceMarks();
-    updateExternalPlayer('reference');
-  };
-}
-
-// release.js ran before the compatibility rename, so initialize reference matching again now.
-if (typeof injectReferenceMatching === 'function') injectReferenceMatching();
-
 const reviewPlayers = {
   clip: {
     video: document.getElementById('clipPreview'),
     card: document.getElementById('clipPlayerCard'),
     play: document.querySelector('[data-play-video="clip"]'),
     seek: document.querySelector('[data-seek-video="clip"]'),
-    time: document.getElementById('clipTime'),
+    time: document.getElementById('clipPlayerTime'),
     duration: document.getElementById('clipDuration'),
     fullscreen: document.querySelector('[data-fullscreen-video="clip"]')
   },
@@ -45,7 +15,7 @@ const reviewPlayers = {
     card: document.getElementById('referenceCard'),
     play: document.querySelector('[data-play-video="reference"]'),
     seek: document.querySelector('[data-seek-video="reference"]'),
-    time: document.getElementById('referenceTime'),
+    time: document.getElementById('referencePlayerTime'),
     duration: document.getElementById('referenceDuration'),
     fullscreen: document.querySelector('[data-fullscreen-video="reference"]')
   }
