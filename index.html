@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-skin="kdbc-night">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,16 +8,37 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="release.css" />
   <link rel="stylesheet" href="player.css" />
+  <link rel="stylesheet" href="stabilize.css" />
 </head>
 <body>
+  <div class="legacy-hooks" aria-hidden="true">
+    <span id="clipTime">0.00s</span>
+    <span id="referenceTime">0.00s</span>
+  </div>
+
   <main class="app-shell">
-    <header class="hero">
-      <div>
-        <p class="eyebrow">KINGSTON DRAGONBOAT CLUB</p>
-        <h1>Dragonboat Stroke Review</h1>
-        <p class="hero-copy">Review a paddler clip frame by frame, compare it with a reference video, select what you actually observe, and generate clear standardized coaching feedback.</p>
+    <header class="hero branded-hero">
+      <div class="brand-lockup">
+        <div class="brand-logo-frame">
+          <img class="kdbc-logo" src="https://raw.githubusercontent.com/rselibiomd/dragon-boat-training-builder/main/public/kdbc-logo.jpeg" alt="Kingston Dragon Boat Club logo" />
+        </div>
+        <div>
+          <p class="eyebrow">KINGSTON DRAGONBOAT CLUB</p>
+          <h1>Dragonboat Stroke Review</h1>
+          <p class="hero-copy">Review a paddler clip frame by frame, compare it with a reference video, select what you actually observe, and generate clear standardized coaching feedback.</p>
+        </div>
       </div>
-      <div class="local-badge">100% browser based</div>
+      <div class="hero-tools">
+        <label class="skin-picker">
+          <span>Skin</span>
+          <select id="skinSelect" aria-label="Choose interface skin">
+            <option value="kdbc-night" selected>KDBC Night</option>
+            <option value="focus-teal">Focus Teal</option>
+            <option value="deck-light">Deck Light</option>
+          </select>
+        </label>
+        <div class="local-badge">Release 1.2.1 · Browser based</div>
+      </div>
     </header>
 
     <section class="notice">
@@ -59,7 +80,7 @@
       <p class="muted workspace-intro">Pause the video and step through the stroke. Frame stepping is approximate, so choose the recording frame rate that best matches your clip.</p>
 
       <div class="video-workspace" id="videoWorkspace">
-        <article class="video-review-card" id="clipPlayerCard">
+        <article class="video-review-card" id="clipPlayerCard" data-player-kind="clip">
           <div class="video-card-heading">
             <strong>Paddler clip</strong>
           </div>
@@ -67,7 +88,7 @@
           <div class="external-player-controls">
             <button type="button" data-play-video="clip" class="player-button">Play</button>
             <input type="range" data-seek-video="clip" class="player-seek" min="0" max="0" step="0.001" value="0" aria-label="Paddler video timeline" />
-            <div class="player-time"><span id="clipTime">0:00.00</span><span>/</span><span id="clipDuration">0:00.00</span></div>
+            <div class="player-time"><span id="clipPlayerTime">0:00.00</span><span>/</span><span id="clipDuration">0:00.00</span></div>
             <button type="button" data-fullscreen-video="clip" class="player-button">Fullscreen</button>
           </div>
           <div class="scrub-controls">
@@ -105,7 +126,7 @@
           </div>
         </article>
 
-        <article id="referencePlayerCard" class="video-review-card hidden">
+        <article id="referenceCard" class="video-review-card hidden" data-player-kind="reference">
           <div class="video-card-heading">
             <strong>Reference clip</strong>
           </div>
@@ -113,7 +134,7 @@
           <div class="external-player-controls">
             <button type="button" data-play-video="reference" class="player-button">Play</button>
             <input type="range" data-seek-video="reference" class="player-seek" min="0" max="0" step="0.001" value="0" aria-label="Reference video timeline" />
-            <div class="player-time"><span id="referenceTime">0:00.00</span><span>/</span><span id="referenceDuration">0:00.00</span></div>
+            <div class="player-time"><span id="referencePlayerTime">0:00.00</span><span>/</span><span id="referenceDuration">0:00.00</span></div>
             <button type="button" data-fullscreen-video="reference" class="player-button">Fullscreen</button>
           </div>
           <div class="scrub-controls">
@@ -264,5 +285,6 @@
   <script src="app.js"></script>
   <script src="release.js"></script>
   <script src="player.js"></script>
+  <script src="stabilize.js"></script>
 </body>
 </html>
