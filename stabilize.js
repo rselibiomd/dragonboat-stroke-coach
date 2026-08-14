@@ -15,6 +15,16 @@ function currentReviewHasWork() {
   );
 }
 
+function clearReviewForNewClip() {
+  state.result = null;
+  if (typeof resetSelections === 'function') resetSelections();
+  if (typeof releaseState !== 'undefined') releaseState.frameLabels = {};
+  els.coachNote.value = '';
+  els.resultPanel.classList.add('hidden');
+  updatePhaseButtons();
+  updateReviewCompletion();
+}
+
 function applySkin(skin) {
   const allowed = ['kdbc-night', 'focus-teal', 'deck-light'];
   const next = allowed.includes(skin) ? skin : 'kdbc-night';
@@ -59,7 +69,10 @@ function addFileActions() {
     button.addEventListener('click', () => removeVideo(button.dataset.removeFile));
   });
 
-  els.clipInput.addEventListener('change', () => setTimeout(() => setFileActionVisibility('clip'), 0));
+  els.clipInput.addEventListener('change', () => setTimeout(() => {
+    clearReviewForNewClip();
+    setFileActionVisibility('clip');
+  }, 0));
   els.referenceInput.addEventListener('change', () => setTimeout(() => setFileActionVisibility('reference'), 0));
 
   for (const [kind, zone] of [['clip', document.getElementById('clipDropZone')], ['reference', document.getElementById('referenceDropZone')]]) {
@@ -68,8 +81,10 @@ function addFileActions() {
         if (!window.confirm('Replacing the paddler clip will clear the current key frames and review selections. Continue?')) {
           event.preventDefault();
           event.stopImmediatePropagation();
+          return;
         }
       }
+      if (kind === 'clip') setTimeout(clearReviewForNewClip, 0);
     }, true);
   }
 }
@@ -100,6 +115,7 @@ function removeVideo(kind) {
     if (typeof resetSelections === 'function') resetSelections();
     if (typeof renderKeyFrames === 'function') renderKeyFrames();
     if (typeof releaseState !== 'undefined') releaseState.frameLabels = {};
+    els.coachNote.value = '';
   } else {
     revoke(state.referenceUrl);
     state.referenceUrl = null;
@@ -205,8 +221,7 @@ function wireKeyboardShortcuts() {
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
       const direction = event.key === 'ArrowRight' ? 1 : -1;
-      const amount = event.shiftKey ? 0.5 : direction / getFps(kind);
-      nudgeVideo(kind, event.shiftKey ? direction * 0.5 : amount);
+      nudgeVideo(kind, event.shiftKey ? direction * 0.5 : direction / getFps(kind));
       return;
     }
     if (kind === 'clip' && ['1', '2', '3', '4'].includes(event.key)) {
