@@ -1,0 +1,45 @@
+/* Release 1.1 + 1.2 */
+.release-toolbar{margin-top:14px;display:grid;gap:10px}
+.mode-switch,.phase-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.mode-button,.phase-tab,.small-ghost-button,.reference-mark-buttons button,.compare-button,.key-frame-actions button,.lightbox-header button{border:1px solid var(--line);background:#091626;color:var(--text);border-radius:9px;padding:8px 11px;font-weight:800}
+.mode-button.active,.phase-tab.active{border-color:var(--accent);background:rgba(77,213,178,.10);color:var(--accent-2)}
+.phase-tabs{padding:8px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.015)}
+.phase-tab{flex:1;min-width:120px}
+.phase-review.quick-mode .phase-hidden{display:none}
+.quick-phase-tools{grid-column:1/-1;display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.phase-frame-status{font-size:.78rem;color:var(--muted)}
+.phase-frame-status.has-frame{color:var(--accent-2)}
+.reference-phase-tools{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:grid;gap:10px}
+.reference-tool-heading{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.reference-tool-heading span{font-size:.78rem;color:var(--muted)}
+.reference-mark-buttons,.compare-phase-row{display:flex;gap:7px;flex-wrap:wrap}
+.reference-mark-buttons button,.compare-button{font-size:.78rem}
+.compare-button:disabled{opacity:.35;cursor:not-allowed}
+.reference-marks{display:flex;gap:6px;flex-wrap:wrap}
+.reference-mark-pill{font-size:.72rem;padding:5px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.reference-mark-pill.saved{border-color:#315b54;color:var(--accent-2);background:rgba(77,213,178,.05)}
+.compare-phase-row>span{align-self:center;font-size:.78rem;color:var(--muted);margin-right:4px}
+.enhanced-key-frame{display:grid!important;grid-template-rows:auto auto auto;padding:0!important;overflow:hidden}
+.frame-image-button{border:0;background:#050a10;padding:0;display:block;width:100%}
+.frame-image-button img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.key-frame-copy{display:grid;padding:8px 9px;gap:2px}
+.key-frame-copy>span{display:block!important;padding:0!important}
+.primary-tag{width:max-content!important;font-size:.62rem!important;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)!important;font-weight:900}
+.key-frame-actions{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}
+.key-frame-actions button{border:0;border-right:1px solid var(--line);border-radius:0;padding:7px 4px;font-size:.7rem;font-weight:700}
+.key-frame-actions button:last-child{border-right:0}
+.danger-text{color:var(--danger)!important}
+.editable-feedback-card{border-color:#3a665f;background:rgba(77,213,178,.035)}
+.editable-heading{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px}
+.editable-heading p{color:var(--muted);font-size:.8rem;margin-top:4px}
+#editableFeedback{min-height:220px;line-height:1.55;font-family:inherit}
+.frame-lightbox{width:min(1000px,calc(100% - 28px));border:1px solid var(--line);border-radius:16px;background:var(--panel);color:var(--text);padding:14px}
+.frame-lightbox::backdrop{background:rgba(0,0,0,.78)}
+.frame-lightbox img{width:100%;max-height:75vh;object-fit:contain;background:#000;border-radius:10px}
+.lightbox-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.frame-lightbox p{margin:8px 0 0;color:var(--muted)}
+.review-info-grid{grid-template-columns:2fr 1fr 1fr 1fr!important}
+.result-panel[data-feedback-style="quick"] .editable-feedback-card{margin-top:0}
+@media(max-width:900px){.review-info-grid{grid-template-columns:1fr 1fr!important}.reference-tool-heading{align-items:flex-start;flex-direction:column}}
+@media(max-width:600px){.mode-switch>*{flex:1}.phase-tabs{display:grid;grid-template-columns:1fr 1fr}.phase-tab{min-width:0}.review-info-grid{grid-template-columns:1fr!important}.key-frame-actions{grid-template-columns:1fr 1fr}.editable-heading{flex-direction:column}.reference-mark-buttons,.compare-phase-row{display:grid;grid-template-columns:1fr 1fr}}
+@media print{#editableFeedbackCard{display:block!important}#editableFeedback{border:1px solid #bbb;background:white;color:black;min-height:auto}.release-toolbar{display:none!important}}
