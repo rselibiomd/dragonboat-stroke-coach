@@ -275,6 +275,21 @@ function wirePrintPolish() {
   if (originalPrint) originalPrint.addEventListener('click', syncPrintMessage, true);
 }
 
+function loadRelease13() {
+  if (!document.querySelector('link[href="library.css"]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'library.css';
+    document.head.appendChild(link);
+  }
+  if (!document.querySelector('script[src="library.js"]')) {
+    const script = document.createElement('script');
+    script.src = 'library.js';
+    script.defer = true;
+    document.body.appendChild(script);
+  }
+}
+
 initializeSkin();
 addFileActions();
 preserveReplaceWarning();
@@ -288,3 +303,4 @@ ensurePrintMessage();
 wirePrintPolish();
 setFileActionVisibility('clip');
 setFileActionVisibility('reference');
+loadRelease13();
