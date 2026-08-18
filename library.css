@@ -1,0 +1,76 @@
+/* Release 1.3 KDBC Technical Library */
+
+.app-navigation13{position:sticky;top:0;z-index:50;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 14px;padding:7px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(12px);box-shadow:0 9px 28px rgba(0,0,0,.12)}
+.app-nav-button{border:1px solid transparent;border-radius:10px;background:transparent;color:var(--muted);padding:10px 12px;font-weight:850;letter-spacing:.01em;cursor:pointer}
+.app-nav-button:hover{color:var(--text);background:color-mix(in srgb,var(--panel-2) 72%,transparent)}
+.app-nav-button.active{border-color:color-mix(in srgb,var(--accent) 48%,var(--line));background:color-mix(in srgb,var(--accent) 10%,var(--panel));color:var(--accent-2)}
+.library-hidden13{display:none!important}
+.library-shell13{display:grid;gap:14px}
+.library-heading13{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:18px}
+.library-heading13 h2{font-size:clamp(1.55rem,3vw,2.3rem);margin:.1rem 0 .35rem}
+.library-heading13 p:not(.eyebrow){max-width:760px;color:var(--muted);line-height:1.55}
+.library-search13{width:min(330px,100%);flex:0 0 auto}
+.library-search13 span{font-size:.72rem;color:var(--muted);font-weight:800}
+.library-search13 input{width:100%;margin-top:5px}
+.library-filter-row13{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:17px}
+.library-filter-button13{border:1px solid var(--line);border-radius:999px;background:color-mix(in srgb,var(--panel-2) 80%,transparent);color:var(--muted);padding:7px 11px;font-size:.76rem;font-weight:800;cursor:pointer}
+.library-filter-button13.active{border-color:var(--accent);color:var(--accent-2);background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
+
+.tech-phase13{border-top:1px solid var(--line);padding:24px 0 8px}
+.tech-phase13:first-child{border-top:0;padding-top:4px}
+.tech-phase-header13{display:grid;grid-template-columns:auto 1fr;gap:15px;align-items:flex-start;margin-bottom:14px}
+.tech-phase-number13{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--accent);color:var(--bg);font-weight:950;font-size:1rem}
+.tech-phase-header13 h3{font-size:1.06rem;line-height:1.45;margin:.15rem 0 .4rem;max-width:900px}
+.tech-phase-header13 p:last-child{color:var(--muted);line-height:1.5;max-width:900px}
+.tech-cues13{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 16px 53px}
+.tech-cues13 span,.library-cue13,.cue-chips13 strong,.drill-cues13 strong{display:inline-flex;border-radius:999px;border:1px solid color-mix(in srgb,var(--accent) 44%,var(--line));background:color-mix(in srgb,var(--accent) 8%,var(--panel));color:var(--accent-2);font-size:.75rem;font-weight:850;padding:6px 9px}
+.tech-issues-grid13{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-left:53px}
+.tech-issue13{border:1px solid var(--line);border-radius:13px;background:color-mix(in srgb,var(--panel-2) 78%,transparent);padding:14px;transition:border-color .2s,box-shadow .2s,transform .2s}
+.tech-issue13.guide-highlight13{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent);transform:translateY(-2px)}
+.tech-issue-heading13 span,.drill-heading13 span{font-size:.64rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:900}
+.tech-issue-heading13 h4,.drill-heading13 h3{margin:.22rem 0 .75rem;font-size:1rem}
+.tech-issue13 dl,.drill-card13 dl{display:grid;gap:10px}
+.tech-issue13 dl>div,.drill-card13 dl>div{display:grid;gap:4px}
+.tech-issue13 dt,.drill-card13 dt{font-size:.67rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:900}
+.tech-issue13 dd,.drill-card13 dd{margin:0;line-height:1.48;font-size:.86rem}
+.library-text-link13{border:0;background:transparent;padding:0;color:var(--accent-2);font:inherit;font-weight:850;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;cursor:pointer;text-align:left}
+
+.cue-library-grid13{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+.cue-card13{border:1px solid var(--line);border-radius:13px;background:color-mix(in srgb,var(--panel-2) 78%,transparent);padding:14px;min-height:150px}
+.cue-card13 p{font-size:.83rem;line-height:1.48;color:var(--muted);margin-top:12px}
+.cue-chips13{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+
+.drill-library-grid13{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.drill-card13{border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--panel-2) 78%,transparent);padding:15px}
+.drill-cues13{display:flex;gap:6px;flex-wrap:wrap}
+.library-empty13{grid-column:1/-1;border:1px dashed var(--line);border-radius:12px;padding:24px;text-align:center;color:var(--muted)}
+.library-attribution13{text-align:center;color:var(--muted);font-size:.7rem;padding:5px 0 18px}
+
+.check-option.correction{position:relative;padding-right:61px}
+.review-guide-button13{position:absolute;right:7px;top:50%;transform:translateY(-50%);border:1px solid var(--line);border-radius:8px;background:color-mix(in srgb,var(--panel-2) 90%,transparent);color:var(--muted);padding:5px 7px;font-size:.65rem;font-weight:850;cursor:pointer}
+.review-guide-button13:hover{border-color:var(--accent);color:var(--accent-2)}
+
+:root[data-skin="deck-light"] .app-navigation13{background:rgba(255,255,255,.94)}
+:root[data-skin="deck-light"] .tech-issue13,
+:root[data-skin="deck-light"] .cue-card13,
+:root[data-skin="deck-light"] .drill-card13{background:#f8fafc}
+:root[data-skin="deck-light"] .review-guide-button13{background:#fff;color:#425463}
+
+@media(max-width:980px){
+  .cue-library-grid13{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tech-issues-grid13,.drill-library-grid13{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  .app-navigation13{top:0;margin-left:-2px;margin-right:-2px;gap:3px;padding:5px;border-radius:11px}
+  .app-nav-button{padding:9px 4px;font-size:.74rem}
+  .library-heading13{flex-direction:column;gap:11px}
+  .library-search13{width:100%}
+  .tech-phase-header13{grid-template-columns:32px 1fr;gap:10px}
+  .tech-phase-number13{width:32px;height:32px;font-size:.85rem}
+  .tech-cues13,.tech-issues-grid13{margin-left:0}
+  .cue-library-grid13{grid-template-columns:1fr}
+  .tech-phase-header13 h3{font-size:.96rem}
+}
+@media print{
+  .app-navigation13,.library-shell13{display:none!important}
+}
