@@ -1,0 +1,19 @@
+/* Release 1.3 final pass */
+
+.timing-throughout13{margin:10px 0 0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;color:var(--muted);background:color-mix(in srgb,var(--accent) 5%,transparent);font-size:.82rem}
+.timing-throughout13 strong{color:var(--text)}
+.training-builder-button13{width:100%;justify-content:center}
+.training-builder-button13:disabled{opacity:.45;cursor:not-allowed}
+.training-builder-note13{margin:10px 0 0;font-size:.76rem;line-height:1.45;color:var(--muted)}
+.training-builder-link13{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.shortlist-actions13{grid-template-columns:minmax(0,1fr) auto auto}
+
+@media(max-width:700px){
+  .shortlist-actions13{grid-template-columns:1fr 1fr}
+  .training-builder-button13{grid-column:1/-1}
+  .training-builder-link13{width:100%}
+}
+
+@media print{
+  .training-builder-link13,.training-builder-button13,.training-builder-note13{display:none!important}
+}
