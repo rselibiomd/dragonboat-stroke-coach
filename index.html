@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="library.css" />
   <link rel="stylesheet" href="library-pass2.css" />
   <link rel="stylesheet" href="library-final.css" />
+  <link rel="stylesheet" href="shortlist-sync.css" />
 </head>
 <body>
   <div class="legacy-hooks" aria-hidden="true">
@@ -50,103 +51,44 @@
 
     <section class="panel upload-grid">
       <div class="upload-card">
-        <div class="section-heading">
-          <div><span class="step">1</span><h2>Paddler clip</h2></div>
-          <span class="required">Required</span>
-        </div>
-        <label class="drop-zone" id="clipDropZone">
-          <input id="clipInput" type="file" accept="video/*,.mov,.mp4,.m4v,.webm" />
-          <span class="drop-title">Choose a short paddling clip</span>
-          <span class="drop-subtitle">A clear side or diagonal angle is best. Short clips are easier to review.</span>
-        </label>
+        <div class="section-heading"><div><span class="step">1</span><h2>Paddler clip</h2></div><span class="required">Required</span></div>
+        <label class="drop-zone" id="clipDropZone"><input id="clipInput" type="file" accept="video/*,.mov,.mp4,.m4v,.webm" /><span class="drop-title">Choose a short paddling clip</span><span class="drop-subtitle">A clear side or diagonal angle is best. Short clips are easier to review.</span></label>
         <div id="clipMeta" class="file-meta hidden"></div>
       </div>
-
       <div class="upload-card">
-        <div class="section-heading">
-          <div><span class="step">2</span><h2>Reference clip</h2></div>
-          <span class="optional">Optional</span>
-        </div>
-        <label class="drop-zone secondary" id="referenceDropZone">
-          <input id="referenceInput" type="file" accept="video/*,.mov,.mp4,.m4v,.webm" />
-          <span class="drop-title">Add the Montreal reference or another model</span>
-          <span class="drop-subtitle">Use it for visual comparison of body sequence and positioning, not to copy stroke rate.</span>
-        </label>
+        <div class="section-heading"><div><span class="step">2</span><h2>Reference clip</h2></div><span class="optional">Optional</span></div>
+        <label class="drop-zone secondary" id="referenceDropZone"><input id="referenceInput" type="file" accept="video/*,.mov,.mp4,.m4v,.webm" /><span class="drop-title">Add the Montreal reference or another model</span><span class="drop-subtitle">Use it for visual comparison of body sequence and positioning, not to copy stroke rate.</span></label>
         <div id="referenceMeta" class="file-meta hidden"></div>
       </div>
     </section>
 
     <section id="reviewWorkspace" class="panel hidden">
-      <div class="section-heading compact">
-        <div><span class="step">3</span><h2>Review the stroke</h2></div>
-      </div>
+      <div class="section-heading compact"><div><span class="step">3</span><h2>Review the stroke</h2></div></div>
       <p class="muted workspace-intro">Pause the video and step through the stroke. Frame stepping is approximate, so choose the recording frame rate that best matches your clip.</p>
-
       <div class="video-workspace" id="videoWorkspace">
         <article class="video-review-card" id="clipPlayerCard" data-player-kind="clip">
           <div class="video-card-heading"><strong>Paddler clip</strong></div>
           <video id="clipPreview" class="review-video" muted playsinline></video>
-          <div class="external-player-controls">
-            <button type="button" data-play-video="clip" class="player-button">Play</button>
-            <input type="range" data-seek-video="clip" class="player-seek" min="0" max="0" step="0.001" value="0" aria-label="Paddler video timeline" />
-            <div class="player-time"><span id="clipPlayerTime">0:00.00</span><span>/</span><span id="clipDuration">0:00.00</span></div>
-            <button type="button" data-fullscreen-video="clip" class="player-button">Fullscreen</button>
-          </div>
-          <div class="scrub-controls">
-            <button type="button" data-step-video="clip" data-step="-0.5">-0.5s</button>
-            <button type="button" data-frame-video="clip" data-direction="-1">◀ Frame</button>
-            <button type="button" data-frame-video="clip" data-direction="1">Frame ▶</button>
-            <button type="button" data-step-video="clip" data-step="0.5">+0.5s</button>
-          </div>
-          <div class="video-options">
-            <label>Frame rate
-              <select id="clipFps"><option value="30" selected>30 fps</option><option value="60">60 fps</option><option value="120">120 fps</option><option value="24">24 fps</option></select>
-            </label>
-            <label>Playback
-              <select id="clipSpeed"><option value="0.25">0.25x</option><option value="0.5" selected>0.5x</option><option value="0.75">0.75x</option><option value="1">1x</option></select>
-            </label>
-          </div>
-          <div class="mark-frame-box">
-            <span>Mark this paddler frame as:</span>
-            <div class="phase-buttons">
-              <button type="button" data-mark-phase="setup">Set-up</button><button type="button" data-mark-phase="catch">Catch</button><button type="button" data-mark-phase="pull">Pull</button><button type="button" data-mark-phase="exit">Exit/Recovery</button>
-            </div>
-          </div>
+          <div class="external-player-controls"><button type="button" data-play-video="clip" class="player-button">Play</button><input type="range" data-seek-video="clip" class="player-seek" min="0" max="0" step="0.001" value="0" aria-label="Paddler video timeline" /><div class="player-time"><span id="clipPlayerTime">0:00.00</span><span>/</span><span id="clipDuration">0:00.00</span></div><button type="button" data-fullscreen-video="clip" class="player-button">Fullscreen</button></div>
+          <div class="scrub-controls"><button type="button" data-step-video="clip" data-step="-0.5">-0.5s</button><button type="button" data-frame-video="clip" data-direction="-1">◀ Frame</button><button type="button" data-frame-video="clip" data-direction="1">Frame ▶</button><button type="button" data-step-video="clip" data-step="0.5">+0.5s</button></div>
+          <div class="video-options"><label>Frame rate<select id="clipFps"><option value="30" selected>30 fps</option><option value="60">60 fps</option><option value="120">120 fps</option><option value="24">24 fps</option></select></label><label>Playback<select id="clipSpeed"><option value="0.25">0.25x</option><option value="0.5" selected>0.5x</option><option value="0.75">0.75x</option><option value="1">1x</option></select></label></div>
+          <div class="mark-frame-box"><span>Mark this paddler frame as:</span><div class="phase-buttons"><button type="button" data-mark-phase="setup">Set-up</button><button type="button" data-mark-phase="catch">Catch</button><button type="button" data-mark-phase="pull">Pull</button><button type="button" data-mark-phase="exit">Exit/Recovery</button></div></div>
         </article>
-
         <article id="referenceCard" class="video-review-card hidden" data-player-kind="reference">
           <div class="video-card-heading"><strong>Reference clip</strong></div>
           <video id="referencePreview" class="review-video" muted playsinline></video>
-          <div class="external-player-controls">
-            <button type="button" data-play-video="reference" class="player-button">Play</button>
-            <input type="range" data-seek-video="reference" class="player-seek" min="0" max="0" step="0.001" value="0" aria-label="Reference video timeline" />
-            <div class="player-time"><span id="referencePlayerTime">0:00.00</span><span>/</span><span id="referenceDuration">0:00.00</span></div>
-            <button type="button" data-fullscreen-video="reference" class="player-button">Fullscreen</button>
-          </div>
-          <div class="scrub-controls">
-            <button type="button" data-step-video="reference" data-step="-0.5">-0.5s</button><button type="button" data-frame-video="reference" data-direction="-1">◀ Frame</button><button type="button" data-frame-video="reference" data-direction="1">Frame ▶</button><button type="button" data-step-video="reference" data-step="0.5">+0.5s</button>
-          </div>
-          <div class="video-options">
-            <label>Frame rate<select id="referenceFps"><option value="30" selected>30 fps</option><option value="60">60 fps</option><option value="120">120 fps</option><option value="24">24 fps</option></select></label>
-            <label>Playback<select id="referenceSpeed"><option value="0.25">0.25x</option><option value="0.5" selected>0.5x</option><option value="0.75">0.75x</option><option value="1">1x</option></select></label>
-          </div>
+          <div class="external-player-controls"><button type="button" data-play-video="reference" class="player-button">Play</button><input type="range" data-seek-video="reference" class="player-seek" min="0" max="0" step="0.001" value="0" aria-label="Reference video timeline" /><div class="player-time"><span id="referencePlayerTime">0:00.00</span><span>/</span><span id="referenceDuration">0:00.00</span></div><button type="button" data-fullscreen-video="reference" class="player-button">Fullscreen</button></div>
+          <div class="scrub-controls"><button type="button" data-step-video="reference" data-step="-0.5">-0.5s</button><button type="button" data-frame-video="reference" data-direction="-1">◀ Frame</button><button type="button" data-frame-video="reference" data-direction="1">Frame ▶</button><button type="button" data-step-video="reference" data-step="0.5">+0.5s</button></div>
+          <div class="video-options"><label>Frame rate<select id="referenceFps"><option value="30" selected>30 fps</option><option value="60">60 fps</option><option value="120">120 fps</option><option value="24">24 fps</option></select></label><label>Playback<select id="referenceSpeed"><option value="0.25">0.25x</option><option value="0.5" selected>0.5x</option><option value="0.75">0.75x</option><option value="1">1x</option></select></label></div>
           <p class="reference-note">Reference comparison is visual only. Compare sequence, posture, and blade timing rather than exact reach or rate.</p>
         </article>
       </div>
-
-      <div id="keyFramesSection" class="key-frames-section hidden">
-        <div class="subheading-row"><div><h3>Key frames</h3><p class="muted">Click a saved frame to return to that point in the paddler video.</p></div><button id="clearFramesButton" class="text-button" type="button">Clear frames</button></div>
-        <div id="keyFrames" class="key-frame-strip"></div>
-      </div>
+      <div id="keyFramesSection" class="key-frames-section hidden"><div class="subheading-row"><div><h3>Key frames</h3><p class="muted">Click a saved frame to return to that point in the paddler video.</p></div><button id="clearFramesButton" class="text-button" type="button">Clear frames</button></div><div id="keyFrames" class="key-frame-strip"></div></div>
     </section>
 
     <section id="coachReview" class="panel hidden">
       <div class="section-heading compact"><div><span class="step">4</span><h2>Coach observations</h2></div></div>
-      <div class="form-grid review-info-grid">
-        <label><span>Paddler / identifier</span><input id="paddlerName" type="text" placeholder="e.g., Sarah, pink cap" /></label>
-        <label><span>Feedback priorities</span><select id="priorityDepth"><option value="1">Top 1 correction</option><option value="2" selected>Top 2 corrections</option><option value="3">Top 3 corrections</option></select></label>
-        <label><span>Camera angle</span><select id="cameraAngle"><option>Side view</option><option>Front diagonal</option><option>Rear diagonal</option><option>Mixed / moving camera</option></select></label>
-      </div>
+      <div class="form-grid review-info-grid"><label><span>Paddler / identifier</span><input id="paddlerName" type="text" placeholder="e.g., Sarah, pink cap" /></label><label><span>Feedback priorities</span><select id="priorityDepth"><option value="1">Top 1 correction</option><option value="2" selected>Top 2 corrections</option><option value="3">Top 3 corrections</option></select></label><label><span>Camera angle</span><select id="cameraAngle"><option>Side view</option><option>Front diagonal</option><option>Rear diagonal</option><option>Mixed / moving camera</option></select></label></div>
       <div class="selection-guide"><strong>Select only what you can clearly see.</strong> Strengths are optional. Corrections are prioritized in the order you select them. You can reorder them below before generating feedback.</div>
       <div id="phaseReview" class="phase-review"></div>
       <section id="prioritySection" class="priority-builder hidden"><div class="subheading-row"><div><h3>Correction priority</h3><p class="muted">The first items will be used in the final feedback based on your selected depth.</p></div></div><div id="priorityBuilderList" class="priority-builder-list"></div></section>
@@ -172,5 +114,6 @@
   <script src="library.js"></script>
   <script src="library-pass2.js"></script>
   <script src="library-final.js"></script>
+  <script src="shortlist-sync.js"></script>
 </body>
 </html>
