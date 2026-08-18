@@ -1,0 +1,39 @@
+/* Release 1.3 shortlist synchronization */
+
+.review-shortlist-notice13{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:8px 0 14px;
+  padding:10px 12px;
+  border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line));
+  border-radius:12px;
+  background:color-mix(in srgb,var(--accent) 8%,var(--panel-2));
+  color:var(--text);
+  font-size:.82rem;
+}
+.review-shortlist-notice13 span{line-height:1.45}
+.generated-drill-action13{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:10px;
+  padding-top:9px;
+  border-top:1px solid var(--line);
+  font-size:.76rem;
+  color:var(--muted);
+}
+.generated-drill-action13 button.active{
+  border-color:var(--accent);
+  color:var(--accent-2);
+  background:color-mix(in srgb,var(--accent) 9%,transparent);
+}
+
+@media(max-width:600px){
+  .review-shortlist-notice13,
+  .generated-drill-action13{align-items:flex-start;flex-direction:column}
+  .review-shortlist-notice13 button,
+  .generated-drill-action13 button{width:100%}
+}
