@@ -1,3 +1,13 @@
+/* Clean temporary branding: no club logo image */
+.brand-logo-frame,
+.kdbc-logo{
+  display:none!important;
+}
+
+.brand-lockup{
+  gap:0!important;
+}
+
 /* Release 1.4 fullscreen correction: video first, controls second */
 
 .video-review-card:fullscreen,
