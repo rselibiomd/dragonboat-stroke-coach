@@ -8,6 +8,10 @@ function polishRelease14() {
     exportState14.logoUrl = '';
   }
 
+  if (typeof drawLogo14 === 'function') {
+    drawLogo14 = async function noLogo14() {};
+  }
+
   const originalDownload = document.getElementById('downloadOriginal14');
   if (originalDownload) originalDownload.remove();
 
