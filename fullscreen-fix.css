@@ -1,0 +1,128 @@
+/* Release 1.4 fullscreen correction: video first, controls second */
+
+.video-review-card:fullscreen,
+.video-review-card.pseudo-fullscreen{
+  box-sizing:border-box!important;
+  width:100dvw!important;
+  height:100dvh!important;
+  min-width:100dvw!important;
+  min-height:100dvh!important;
+  max-width:none!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:8px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#000!important;
+  overflow:hidden!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:minmax(0,1fr) auto auto!important;
+  gap:7px!important;
+}
+
+.video-review-card:fullscreen .video-card-heading,
+.video-review-card.pseudo-fullscreen .video-card-heading,
+.video-review-card:fullscreen .video-options,
+.video-review-card.pseudo-fullscreen .video-options,
+.video-review-card:fullscreen .mark-frame-box,
+.video-review-card.pseudo-fullscreen .mark-frame-box,
+.video-review-card:fullscreen .reference-note,
+.video-review-card.pseudo-fullscreen .reference-note,
+.video-review-card:fullscreen .reference-phase-tools,
+.video-review-card.pseudo-fullscreen .reference-phase-tools,
+.video-review-card:fullscreen #referencePhaseTools,
+.video-review-card.pseudo-fullscreen #referencePhaseTools,
+.video-review-card:fullscreen .stroke-loop14,
+.video-review-card.pseudo-fullscreen .stroke-loop14{
+  display:none!important;
+}
+
+.video-review-card:fullscreen .review-video,
+.video-review-card.pseudo-fullscreen .review-video{
+  grid-row:1!important;
+  align-self:stretch!important;
+  justify-self:stretch!important;
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-width:100%!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:0!important;
+  object-fit:contain!important;
+  background:#000!important;
+  border-radius:0!important;
+}
+
+.video-review-card:fullscreen .external-player-controls,
+.video-review-card.pseudo-fullscreen .external-player-controls{
+  grid-row:2!important;
+  margin:0!important;
+  flex:0 0 auto!important;
+  background:rgba(7,16,28,.96)!important;
+}
+
+.video-review-card:fullscreen .scrub-controls,
+.video-review-card.pseudo-fullscreen .scrub-controls{
+  grid-row:3!important;
+  margin:0!important;
+  flex:0 0 auto!important;
+}
+
+.video-review-card.pseudo-fullscreen{
+  position:fixed!important;
+  inset:0!important;
+  z-index:9999!important;
+}
+
+@media(max-width:700px){
+  .video-review-card:fullscreen,
+  .video-review-card.pseudo-fullscreen{
+    width:100dvw!important;
+    height:100dvh!important;
+    min-height:100dvh!important;
+    padding:4px!important;
+    gap:4px!important;
+  }
+
+  .video-review-card:fullscreen .external-player-controls,
+  .video-review-card.pseudo-fullscreen .external-player-controls{
+    padding:6px!important;
+    gap:6px!important;
+    border-radius:7px!important;
+  }
+
+  .video-review-card:fullscreen .scrub-controls,
+  .video-review-card.pseudo-fullscreen .scrub-controls{
+    gap:4px!important;
+  }
+
+  .video-review-card:fullscreen .scrub-controls button,
+  .video-review-card.pseudo-fullscreen .scrub-controls button{
+    min-height:38px!important;
+    padding:7px 6px!important;
+    font-size:.78rem!important;
+  }
+}
+
+@media(orientation:landscape) and (max-height:550px){
+  .video-review-card:fullscreen,
+  .video-review-card.pseudo-fullscreen{
+    padding:3px!important;
+    gap:3px!important;
+  }
+
+  .video-review-card:fullscreen .external-player-controls,
+  .video-review-card.pseudo-fullscreen .external-player-controls{
+    padding:4px!important;
+  }
+
+  .video-review-card:fullscreen .scrub-controls button,
+  .video-review-card.pseudo-fullscreen .scrub-controls button{
+    min-height:32px!important;
+    padding:5px!important;
+  }
+}
