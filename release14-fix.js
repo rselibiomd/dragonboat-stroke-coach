@@ -1,6 +1,19 @@
 /* Release 1.4 polish */
 
 function polishRelease14() {
+  const officialLogo = 'https://raw.githubusercontent.com/rselibiomd/dragon-boat-training-builder/main/public/kdbc-logo-official.svg';
+
+  const headerLogo = document.querySelector('.kdbc-logo');
+  if (headerLogo) {
+    headerLogo.src = officialLogo;
+    headerLogo.style.objectFit = 'contain';
+    headerLogo.style.background = '#ffffff';
+  }
+
+  if (typeof exportState14 !== 'undefined') {
+    exportState14.logoUrl = officialLogo;
+  }
+
   const originalDownload = document.getElementById('downloadOriginal14');
   if (originalDownload) originalDownload.remove();
 
